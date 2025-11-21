@@ -126,7 +126,7 @@ public class ProductCategoryImportListener extends ExcelImportListener<ProductCa
       record.setAvailable(available);
 
       productCategoryService.save(record);
-      productCategoryService.saveRecursion(record.getId(), record.getParentId());
+      productCategoryService.saveRecursion(true, record.getId(), record.getParentId());
       data.setId(record.getId());
 
       this.setSuccessProcess(i);

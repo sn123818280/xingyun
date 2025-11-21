@@ -7,8 +7,11 @@ import com.lframework.starter.common.exceptions.impl.DefaultClientException;
 import com.lframework.starter.common.utils.CollectionUtil;
 import com.lframework.starter.common.utils.ObjectUtil;
 import com.lframework.starter.common.utils.StringUtil;
+import com.lframework.starter.web.core.annotations.oplog.OpLog;
 import com.lframework.starter.web.core.impl.BaseMpServiceImpl;
 import com.lframework.starter.web.core.utils.IdUtil;
+import com.lframework.starter.web.core.utils.OpLogUtil;
+import com.lframework.starter.web.inner.service.RecursionMappingService;
 import com.lframework.xingyun.basedata.entity.ProductCategory;
 import com.lframework.xingyun.basedata.enums.BaseDataOpLogType;
 import com.lframework.xingyun.basedata.enums.ProductCategoryNodeType;
@@ -17,12 +20,10 @@ import com.lframework.xingyun.basedata.service.product.ProductCategoryService;
 import com.lframework.xingyun.basedata.vo.product.category.CreateProductCategoryVo;
 import com.lframework.xingyun.basedata.vo.product.category.QueryProductCategorySelectorVo;
 import com.lframework.xingyun.basedata.vo.product.category.UpdateProductCategoryVo;
-import com.lframework.starter.web.core.annotations.oplog.OpLog;
-import com.lframework.starter.web.inner.service.RecursionMappingService;
-import com.lframework.starter.web.core.utils.OpLogUtil;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -133,7 +134,7 @@ public class ProductCategoryServiceImpl extends
 
     getBaseMapper().insert(data);
 
-    this.saveRecursion(data.getId(), data.getParentId());
+    this.saveRecursion(true, data.getId(), data.getParentId());
 
     OpLogUtil.setVariable("id", data.getId());
     OpLogUtil.setVariable("code", vo.getCode());
@@ -200,7 +201,11 @@ public class ProductCategoryServiceImpl extends
    * @param parentId
    */
   @Override
-  public void saveRecursion(String categoryId, String parentId) {
+  public void saveRecursion(Boolean isCreate, String categoryId, String parentId) {
+
+    if (!isCreate) {
+      recursionMappingService.deleteNode(categoryId, ProductCategoryNodeType.class);
+    }
 
     if (!StringUtil.isBlank(parentId)) {
       List<String> parentIds = recursionMappingService.getNodeParentIds(parentId,
@@ -210,12 +215,32 @@ public class ProductCategoryServiceImpl extends
       }
       parentIds.add(parentId);
 
-      recursionMappingService.saveNode(categoryId,
-          ProductCategoryNodeType.class,
+      recursionMappingService.saveNode(categoryId, ProductCategoryNodeType.class,
           parentIds);
     } else {
-      recursionMappingService.saveNode(categoryId,
-          ProductCategoryNodeType.class);
+      recursionMappingService.saveNode(categoryId, ProductCategoryNodeType.class);
+    }
+
+    // 还要更新这个节点的子节点
+    List<String> childIds = recursionMappingService.getNodeChildIds(categoryId,
+        ProductCategoryNodeType.class);
+
+    for (String childId : childIds) {
+      List<ProductCategory> parentDeptList = new ArrayList<>();
+      ProductCategory productCategory = this.findById(childId);
+
+      while (StringUtil.isNotBlank(productCategory.getParentId())) {
+        productCategory = this.findById(productCategory.getParentId());
+        if (productCategory == null) {
+          break;
+        }
+        parentDeptList.add(productCategory);
+      }
+
+      parentDeptList = CollectionUtil.reverse(parentDeptList);
+      recursionMappingService.deleteNode(childId, ProductCategoryNodeType.class);
+      recursionMappingService.saveNode(childId, ProductCategoryNodeType.class,
+          parentDeptList.stream().map(ProductCategory::getId).collect(Collectors.toList()));
     }
   }
 

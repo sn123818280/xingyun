@@ -66,5 +66,5 @@ public interface ProductCategoryService extends BaseMpService<ProductCategory> {
    * @param categoryId
    * @param parentId
    */
-  void saveRecursion(String categoryId, String parentId);
+  void saveRecursion(Boolean isCreate, String categoryId, String parentId);
 }

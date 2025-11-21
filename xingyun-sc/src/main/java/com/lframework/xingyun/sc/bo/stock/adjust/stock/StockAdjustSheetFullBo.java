@@ -287,12 +287,14 @@ public class StockAdjustSheetFullBo extends BaseBo<StockAdjustSheetFullDto> {
           ProductCategoryService.class);
       ProductCategory productCategory = productCategoryService.findById(product.getCategoryId());
 
-      ProductBrandService productBrandService = ApplicationUtil.getBean(ProductBrandService.class);
-      ProductBrand productBrand = productBrandService.findById(product.getBrandId());
+      if(StringUtil.isNotBlank(product.getBrandId())) {
+        ProductBrandService productBrandService = ApplicationUtil.getBean(ProductBrandService.class);
+        ProductBrand productBrand = productBrandService.findById(product.getBrandId());
+        this.brandName = productBrand.getName();
+      }
 
       this.productCode = product.getCode();
       this.productName = product.getName();
-      this.brandName = productBrand.getName();
       this.categoryName = productCategory.getName();
       this.skuCode = product.getSkuCode();
       this.externalCode = product.getExternalCode();

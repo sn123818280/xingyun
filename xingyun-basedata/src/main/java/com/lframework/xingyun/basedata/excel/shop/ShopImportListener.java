@@ -54,7 +54,7 @@ public class ShopImportListener extends ExcelImportListener<ShopImportModel> {
     if (!StringUtil.isBlank(data.getDeptCode())) {
       SysDeptService deptService = ApplicationUtil.getBean(SysDeptService.class);
       SysDept dept = deptService.findByCode(data.getDeptCode());
-      if (dept == null) {
+      if (dept == null || !dept.getAvailable()) {
         throw new DefaultClientException(
             "第" + context.readRowHolder().getRowIndex() + "行“所属部门编号”不存在");
       }

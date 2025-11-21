@@ -2,6 +2,7 @@ package com.lframework.xingyun.sc.excel.stock;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.lframework.starter.common.utils.NumberUtil;
+import com.lframework.starter.common.utils.StringUtil;
 import com.lframework.starter.web.core.bo.BaseBo;
 import com.lframework.starter.web.core.utils.ApplicationUtil;
 import com.lframework.starter.web.core.components.excel.ExcelModel;
@@ -105,12 +106,14 @@ public class ProductStockExportModel extends BaseBo<ProductStock> implements Exc
         ProductCategoryService.class);
     ProductCategory productCategory = productCategoryService.findById(product.getCategoryId());
 
-    ProductBrandService productBrandService = ApplicationUtil.getBean(ProductBrandService.class);
-    ProductBrand productBrand = productBrandService.findById(product.getBrandId());
+    if(StringUtil.isNotBlank(product.getBrandId())) {
+      ProductBrandService productBrandService = ApplicationUtil.getBean(ProductBrandService.class);
+      ProductBrand productBrand = productBrandService.findById(product.getBrandId());
+      this.brandName = productBrand.getName();
+    }
 
     this.productCode = product.getCode();
     this.productName = product.getName();
     this.categoryName = productCategory.getName();
-    this.brandName = productBrand.getName();
   }
 }
