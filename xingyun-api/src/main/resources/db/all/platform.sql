@@ -279,6 +279,7 @@ CREATE TABLE `sys_module`  (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '名称',
   `description` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '备注',
+  `is_platform` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否为平台功能模块',
   `create_by` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '创建人',
   `create_by_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '创建人ID',
   `create_time` datetime NOT NULL COMMENT '创建时间',
@@ -291,22 +292,22 @@ CREATE TABLE `sys_module`  (
 -- ----------------------------
 -- Records of sys_module
 -- ----------------------------
-INSERT INTO `sys_module` VALUES (1, '平台管理', '系统平台的核心模块。', '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
-INSERT INTO `sys_module` VALUES (2, '系统管理', '维护企业、系统基础数据，包括部门、岗位、角色、系统菜单和参数等。', '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
-INSERT INTO `sys_module` VALUES (3, '基础信息管理', '维护基础业务数据，包括仓库、客户、供应商、会员等。', '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
-INSERT INTO `sys_module` VALUES (4, '商品中心', '管理商品核心数据。', '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
-INSERT INTO `sys_module` VALUES (5, '采购业务', '管理供应商与企业的采购业务。', '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
-INSERT INTO `sys_module` VALUES (6, '销售业务', '管理企业与TOB端大客户的销售业务。', '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
-INSERT INTO `sys_module` VALUES (7, '零售业务', '管理企业与TOC端会员的零售业务。', '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
-INSERT INTO `sys_module` VALUES (8, '库存管理及调拨', '查询商品库存和进行商品调拨。', '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
-INSERT INTO `sys_module` VALUES (9, '库存盘点', '库存商品盘点。', '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
-INSERT INTO `sys_module` VALUES (10, '库存调整', '商品库存调整。', '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
-INSERT INTO `sys_module` VALUES (11, '结算管理', '企业与供应商、客户进行结算。', '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
-INSERT INTO `sys_module` VALUES (12, '开发管理', '系统快捷开发，如管理定时器、数据实体、数据对象、表单生成等。', '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
-INSERT INTO `sys_module` VALUES (13, '便捷办公', '支持文件收纳和在线Excel。', '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
-INSERT INTO `sys_module` VALUES (14, '开放平台', '系统开放平台管理。', '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
-INSERT INTO `sys_module` VALUES (15, '物流发货', '管理企业物流业务。', '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
-INSERT INTO `sys_module` VALUES (16, '审批流程', '管理审批流程。', '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
+INSERT INTO `sys_module` VALUES (1, '平台管理', '系统平台的核心模块。', 1, '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
+INSERT INTO `sys_module` VALUES (2, '系统管理', '维护企业、系统基础数据，包括部门、岗位、角色和参数等。', 0, '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
+INSERT INTO `sys_module` VALUES (3, '基础信息管理', '维护基础业务数据，包括仓库、客户、供应商、会员等。', 0, '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
+INSERT INTO `sys_module` VALUES (4, '商品中心', '管理商品核心数据。', 0, '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
+INSERT INTO `sys_module` VALUES (5, '采购业务', '管理供应商与企业的采购业务。', 0, '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
+INSERT INTO `sys_module` VALUES (6, '销售业务', '管理企业与TOB端大客户的销售业务。', 0, '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
+INSERT INTO `sys_module` VALUES (7, '零售业务', '管理企业与TOC端会员的零售业务。', 0, '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
+INSERT INTO `sys_module` VALUES (8, '库存管理及调拨', '查询商品库存和进行商品调拨。', 0, '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
+INSERT INTO `sys_module` VALUES (9, '库存盘点', '库存商品盘点。', 0, '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
+INSERT INTO `sys_module` VALUES (10, '库存调整', '商品库存调整。', 0, '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
+INSERT INTO `sys_module` VALUES (11, '结算管理', '企业与供应商、客户进行结算。', 0, '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
+INSERT INTO `sys_module` VALUES (12, '开发管理', '系统快捷开发，如管理定时器、数据实体、数据对象、表单生成等。', 1, '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
+INSERT INTO `sys_module` VALUES (13, '便捷办公', '支持文件收纳和在线Excel。', 0, '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
+INSERT INTO `sys_module` VALUES (14, '开放平台', '系统开放平台管理。', 1, '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
+INSERT INTO `sys_module` VALUES (15, '物流发货', '管理企业物流业务。', 0, '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
+INSERT INTO `sys_module` VALUES (16, '审批流程', '管理审批流程。', 0, '系统管理员', '1', '2023-06-06 10:26:30', '系统管理员', '1', '2023-06-06 10:26:41');
 
 -- ----------------------------
 -- Table structure for sys_module_tenant
@@ -377,6 +378,7 @@ CREATE TABLE `tenant`  (
   `jdbc_url` varchar(400) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'JDBC连接地址',
   `jdbc_username` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'JDBC用户名',
   `jdbc_password` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'JDBC密码',
+  `is_platform` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否为平台管理租户',
   `available` tinyint(1) NOT NULL COMMENT '状态',
   `create_time` datetime NOT NULL COMMENT '创建时间',
   `update_time` datetime NOT NULL COMMENT '修改时间',
@@ -386,6 +388,6 @@ CREATE TABLE `tenant`  (
 -- ----------------------------
 -- Records of tenant
 -- ----------------------------
-INSERT INTO `tenant` VALUES (1000, '测试租户', NULL, 'jdbc:mysql://127.0.0.1:3306/xingyun', 'root', '24590d72bfb4d71ccbc533570aa9627b', 1, '2022-12-31 22:59:21', '2023-03-13 22:14:07');
+INSERT INTO `tenant` VALUES (1000, '测试租户', NULL, 'jdbc:mysql://127.0.0.1:3306/xingyun', 'root', '24590d72bfb4d71ccbc533570aa9627b', 1, 1, '2022-12-31 22:59:21', '2023-03-13 22:14:07');
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -62,7 +62,7 @@ CREATE TABLE `base_data_customer`  (
   `update_by_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '修改人ID',
   `update_time` datetime NOT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `code`(`code`) USING BTREE
+  INDEX `code`(`code`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '客户' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -90,7 +90,7 @@ CREATE TABLE `base_data_logistics_company`  (
   `update_by_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '修改人ID',
   `update_time` datetime NOT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `code`(`code`) USING BTREE
+  INDEX `code`(`code`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '物流公司' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -122,8 +122,8 @@ CREATE TABLE `base_data_member`  (
   `update_by_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '修改人ID',
   `update_time` datetime NOT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `code`(`code`) USING BTREE,
-  UNIQUE INDEX `telephone`(`telephone`) USING BTREE
+  INDEX `code`(`code`) USING BTREE,
+  INDEX `telephone`(`telephone`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '会员' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -148,7 +148,7 @@ CREATE TABLE `base_data_pay_type`  (
   `update_by_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '修改人ID',
   `update_time` datetime NOT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `code`(`code`) USING BTREE
+  INDEX `code`(`code`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '支付方式' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -170,10 +170,10 @@ CREATE TABLE `base_data_product`  (
   `code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '编号',
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '名称',
   `short_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '简称',
-  `sku_code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'SKU',
+  `sku_code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'SKU',
   `external_code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '简码',
   `category_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '类目ID',
-  `brand_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '品牌ID',
+  `brand_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '品牌ID',
   `product_type` tinyint(3) NOT NULL DEFAULT 1 COMMENT '商品类型',
   `tax_rate` decimal(16, 2) NOT NULL COMMENT '进项税率（%）',
   `sale_tax_rate` decimal(16, 2) NOT NULL COMMENT '销项税率',
@@ -189,8 +189,8 @@ CREATE TABLE `base_data_product`  (
   `update_by_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '修改人ID',
   `update_time` datetime NOT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `code`(`code`) USING BTREE,
-  UNIQUE INDEX `sku_code`(`sku_code`) USING BTREE
+  INDEX `code`(`code`) USING BTREE,
+  INDEX `sku_code`(`sku_code`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '商品' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -217,7 +217,8 @@ CREATE TABLE `base_data_product_brand`  (
   `update_by_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '修改人ID',
   `update_time` datetime NOT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `code`(`code`) USING BTREE
+  INDEX `code`(`code`) USING BTREE,
+  INDEX `name`(`name`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '商品品牌' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -268,7 +269,8 @@ CREATE TABLE `base_data_product_category`  (
   `update_by_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '修改人ID',
   `update_time` datetime NOT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `code`(`code`) USING BTREE
+  INDEX `code`(`code`) USING BTREE,
+  INDEX `name`(`name`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '商品类目' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -311,7 +313,9 @@ CREATE TABLE `base_data_product_property`  (
   `update_by` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '修改人',
   `update_by_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '修改人ID',
   `update_time` datetime NOT NULL COMMENT '修改时间',
-  PRIMARY KEY (`id`) USING BTREE
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `code`(`code`) USING BTREE,
+  INDEX `name`(`name`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '商品属性' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -336,7 +340,8 @@ CREATE TABLE `base_data_product_property_item`  (
   `update_by_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '修改人ID',
   `update_time` datetime NOT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `property_id`(`property_id`, `code`) USING BTREE
+  INDEX `property_id`(`property_id`, `code`) USING BTREE,
+  INDEX `property_id2`(`name`, `property_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '商品属性值' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -426,7 +431,7 @@ CREATE TABLE `base_data_store_center`  (
   `update_by_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '修改人ID',
   `update_time` datetime NOT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `code`(`code`) USING BTREE
+  INDEX `code`(`code`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '仓库' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -466,7 +471,7 @@ CREATE TABLE `base_data_supplier`  (
   `update_by_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '修改人ID',
   `update_time` datetime NOT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `code`(`code`) USING BTREE
+  INDEX `code`(`code`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '供应商' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -5213,7 +5218,7 @@ CREATE TABLE `settle_in_item`  (
   `update_by_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '修改人ID',
   `update_time` datetime NOT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `code`(`code`) USING BTREE
+  INDEX `code`(`code`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '收入项目' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -5237,7 +5242,7 @@ CREATE TABLE `settle_out_item`  (
   `update_by_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '修改人ID',
   `update_time` datetime NOT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `code`(`code`) USING BTREE
+  INDEX `code`(`code`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '支出项目' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -5669,24 +5674,27 @@ CREATE TABLE `sys_menu`  (
 -- Records of sys_menu
 -- ----------------------------
 INSERT INTO `sys_menu` VALUES ('1000', '1000', 'System', '系统管理', 'ant-design:setting-outlined', NULL, '', NULL, NULL, '2', '/system', 0, 0, 0, '', 1, 1, '', '系统管理员', '1', '2021-07-04 00:22:05', '系统管理员', '1', '2023-10-27 17:01:09');
-INSERT INTO `sys_menu` VALUES ('1000001', '1000001', 'Menu', '菜单管理', NULL, 0, '/system/menu/index', NULL, '1000', '2', '/menu', 0, 1, 0, 'system:menu:query', 1, 1, '', '系统管理员', '1', '2021-05-08 18:37:01', '系统管理员', '1', '2023-10-27 17:01:09');
-INSERT INTO `sys_menu` VALUES ('1000001001', '1000001001', '', '新增菜单', NULL, 0, '', NULL, '1000001', '2', '', 0, 2, 0, 'system:menu:add', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2023-10-27 17:01:09');
-INSERT INTO `sys_menu` VALUES ('1000001002', '1000001002', '', '修改菜单', NULL, 0, '', NULL, '1000001', '2', '', 0, 2, 0, 'system:menu:modify', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2023-10-27 17:00:27');
-INSERT INTO `sys_menu` VALUES ('1000001003', '1000001003', '', '删除菜单', NULL, 0, '', NULL, '1000001', '2', '', 0, 2, 0, 'system:menu:delete', 1, 1, '', '系统管理员', '1', '2021-05-12 23:24:36', '系统管理员', '1', '2023-10-27 17:00:27');
+INSERT INTO `sys_menu` VALUES ('1000001', '1000001', 'Menu', '菜单管理', NULL, 0, '/system/menu/index', NULL, '1001', '1', '/menu', 0, 1, 0, 'system:menu:query', 1, 1, '', '系统管理员', '1', '2021-05-08 18:37:01', '系统管理员', '1', '2023-10-27 17:01:09');
+INSERT INTO `sys_menu` VALUES ('1000001001', '1000001001', '', '新增菜单', NULL, 0, '', NULL, '1000001', '1', '', 0, 2, 0, 'system:menu:add', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2023-10-27 17:01:09');
+INSERT INTO `sys_menu` VALUES ('1000001002', '1000001002', '', '修改菜单', NULL, 0, '', NULL, '1000001', '1', '', 0, 2, 0, 'system:menu:modify', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2023-10-27 17:00:27');
+INSERT INTO `sys_menu` VALUES ('1000001003', '1000001003', '', '删除菜单', NULL, 0, '', NULL, '1000001', '1', '', 0, 2, 0, 'system:menu:delete', 1, 1, '', '系统管理员', '1', '2021-05-12 23:24:36', '系统管理员', '1', '2023-10-27 17:00:27');
 INSERT INTO `sys_menu` VALUES ('1000002', '1000002', 'Dept', '部门管理', NULL, 0, '/system/dept/index', NULL, '1000', '2', '/dept', 0, 1, 0, 'system:dept:query', 1, 1, '', '系统管理员', '1', '2021-07-05 01:09:27', '系统管理员', '1', '2023-10-27 17:00:27');
 INSERT INTO `sys_menu` VALUES ('1000002001', '1000002001', '', '新增部门', NULL, 0, '', NULL, '1000002', '2', '', 0, 2, 0, 'system:dept:add', 1, 1, '', '系统管理员', '1', '2021-06-27 01:33:31', '系统管理员', '1', '2023-10-27 17:00:27');
 INSERT INTO `sys_menu` VALUES ('1000002002', '1000002002', '', '修改部门', NULL, 0, '', NULL, '1000002', '2', '', 0, 2, 0, 'system:dept:modify', 1, 1, '', '系统管理员', '1', '2021-06-27 01:33:47', '系统管理员', '1', '2023-10-27 17:00:27');
 INSERT INTO `sys_menu` VALUES ('1000002003', '1000002003', '', '部门权限', NULL, 0, '', NULL, '1000002', '2', '', 0, 2, 0, 'system:dept:permission', 1, 1, '', '系统管理员', '1', '2021-06-27 01:33:47', '系统管理员', '1', '2023-10-27 17:00:27');
+INSERT INTO `sys_menu` VALUES ('1000002004', '1000002004', '', '删除部门', NULL, 0, '', NULL, '1000002', '2', '', 0, 2, 0, 'system:dept:delete', 1, 1, '', '系统管理员', '1', '2021-06-27 01:33:47', '系统管理员', '1', '2025-01-19 18:36:07');
 INSERT INTO `sys_menu` VALUES ('1000004', '1000004', 'Role', '角色管理', NULL, 0, '/system/role/index', NULL, '1000', '2', '/role', 0, 1, 0, 'system:role:query', 1, 1, '', '系统管理员', '1', '2021-07-04 00:35:49', '系统管理员', '1', '2021-07-04 00:35:49');
 INSERT INTO `sys_menu` VALUES ('1000004001', '1000004001', '', '新增角色', NULL, 0, '', NULL, '1000004', '2', '', 0, 2, 0, 'system:role:add', 1, 1, '', '系统管理员', '1', '2021-06-30 00:32:17', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('1000004002', '1000004002', '', '修改角色', NULL, 0, '', NULL, '1000004', '2', '', 0, 2, 0, 'system:role:modify', 1, 1, '', '系统管理员', '1', '2021-06-30 00:32:45', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('1000004003', '1000004003', '', '角色授权', NULL, 0, '', NULL, '1000004', '2', '', 0, 2, 0, 'system:role:permission', 1, 1, '', '系统管理员', '1', '2021-06-30 00:32:45', '系统管理员', '1', '2021-07-04 00:34:23');
+INSERT INTO `sys_menu` VALUES ('1000004004', '1000004004', '', '删除角色', NULL, 0, '', NULL, '1000004', '2', '', 0, 2, 0, 'system:role:delete', 1, 1, '', '系统管理员', '1', '2021-06-30 00:32:45', '系统管理员', '1', '2025-01-19 18:36:08');
 INSERT INTO `sys_menu` VALUES ('1000005', '1000005', 'User', '用户管理', NULL, 0, '/system/user/index', NULL, '1000', '2', '/user', 0, 1, 0, 'system:user:query', 1, 1, '', '系统管理员', '1', '2021-07-05 01:08:40', '系统管理员', '1', '2021-07-05 01:08:40');
 INSERT INTO `sys_menu` VALUES ('1000005001', '1000005001', '', '新增用户', NULL, 0, '', NULL, '1000005', '2', '', 0, 2, 0, 'system:user:add', 1, 1, '', '系统管理员', '1', '2021-06-30 00:32:17', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('1000005002', '1000005002', '', '修改用户', NULL, 0, '', NULL, '1000005', '2', '', 0, 2, 0, 'system:user:modify', 1, 1, '', '系统管理员', '1', '2021-06-30 00:32:45', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('1000005003', '1000005003', '', '用户授权', NULL, 0, '', NULL, '1000005', '2', '', 0, 2, 0, 'system:user:permission', 1, 1, '', '系统管理员', '1', '2021-06-30 00:32:45', '系统管理员', '1', '2021-07-04 00:34:23');
+INSERT INTO `sys_menu` VALUES ('1000005004', '1000005004', '', '删除用户', NULL, 0, '', NULL, '1000005', '2', '', 0, 2, 0, 'system:user:delete', 1, 1, '', '系统管理员', '1', '2021-06-30 00:32:45', '系统管理员', '1', '2025-01-19 18:36:09');
 INSERT INTO `sys_menu` VALUES ('1000006', '1000006', 'Oplog', '操作日志', NULL, 0, '/system/oplog/index', NULL, '1000', '2', '/oplog', 0, 1, 0, 'system:oplog:query', 1, 1, '', '系统管理员', '1', '2021-07-05 01:08:40', '系统管理员', '1', '2021-07-05 01:08:40');
-INSERT INTO `sys_menu` VALUES ('1000007', '1000007', 'SysParameter', '系统参数', NULL, 0, '/system/parameter/index', NULL, '1000', '2', '/parameter', 0, 1, 0, 'system:parameter:query', 1, 1, '', '系统管理员', '1', '2021-05-08 18:37:01', '系统管理员', '1', '2021-12-09 17:54:42');
+INSERT INTO `sys_menu` VALUES ('1000007', '1000007', 'SysParameter', '系统参数', NULL, 0, '/system/parameter/index', NULL, '1001', '2', '/parameter', 0, 1, 0, 'system:parameter:query', 1, 1, '', '系统管理员', '1', '2021-05-08 18:37:01', '系统管理员', '1', '2021-12-09 17:54:42');
 INSERT INTO `sys_menu` VALUES ('1000007001', '1000007001', '', '新增系统参数', NULL, 0, '', NULL, '1000007', '2', '', 0, 2, 0, 'system:parameter:add', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2021-12-09 17:54:42');
 INSERT INTO `sys_menu` VALUES ('1000007002', '1000007002', '', '修改系统参数', NULL, 0, '', NULL, '1000007', '2', '', 0, 2, 0, 'system:parameter:modify', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-12-09 17:54:42');
 INSERT INTO `sys_menu` VALUES ('1000007003', '1000007003', '', '删除系统参数', NULL, 0, '', NULL, '1000007', '2', '', 0, 2, 0, 'system:parameter:delete', 1, 1, '', '系统管理员', '1', '2021-05-12 23:24:36', '系统管理员', '1', '2021-07-04 00:34:23');
@@ -5694,7 +5702,7 @@ INSERT INTO `sys_menu` VALUES ('1000008', '1000008', 'PublishSysNotice', '发布
 INSERT INTO `sys_menu` VALUES ('1000008001', '1000008001', '', '新增系统通知', NULL, 0, '', NULL, '1000008', '2', '', 0, 2, 0, 'system:notice:add', 0, 1, '', '系统管理员', '1', '2022-08-18 14:31:12', '系统管理员', '1', '2022-08-18 14:31:12');
 INSERT INTO `sys_menu` VALUES ('1000008002', '1000008002', '', '修改系统通知', NULL, 0, '', NULL, '1000008', '2', '', 0, 2, 0, 'system:notice:modify', 0, 1, '', '系统管理员', '1', '2022-08-18 14:31:12', '系统管理员', '1', '2022-08-18 14:31:12');
 INSERT INTO `sys_menu` VALUES ('1000009', '1002001', 'MySysNotice', '我的系统通知', NULL, 0, '/system/notice/index', NULL, '1002', '2', '/system/notice/my', 0, 1, 0, '', 0, 1, '', '系统管理员', '1', '2022-08-18 14:31:12', '系统管理员', '1', '2022-08-18 14:31:12');
-INSERT INTO `sys_menu` VALUES ('1000010', '1000010', 'SysDataDic', '数据字典', NULL, 0, '/system/dic/index', NULL, '1000', '2', '/dic', 0, 1, 0, 'system:dic:query', 1, 1, '', '系统管理员', '1', '2021-05-08 18:37:01', '系统管理员', '1', '2021-12-09 17:54:42');
+INSERT INTO `sys_menu` VALUES ('1000010', '1000010', 'SysDataDic', '数据字典', NULL, 0, '/system/dic/index', NULL, '1001', '2', '/dic', 0, 1, 0, 'system:dic:query', 1, 1, '', '系统管理员', '1', '2021-05-08 18:37:01', '系统管理员', '1', '2021-12-09 17:54:42');
 INSERT INTO `sys_menu` VALUES ('1000010001', '1000010001', '', '新增数据字典', NULL, 0, '', NULL, '1000010', '2', '', 0, 2, 0, 'system:dic:add', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2021-12-09 17:54:42');
 INSERT INTO `sys_menu` VALUES ('1000010002', '1000010002', '', '修改数据字典', NULL, 0, '', NULL, '1000010', '2', '', 0, 2, 0, 'system:dic:modify', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-12-09 17:54:42');
 INSERT INTO `sys_menu` VALUES ('1000010003', '1000010003', '', '删除数据字典', NULL, 0, '', NULL, '1000010', '2', '', 0, 2, 0, 'system:dic:delete', 1, 1, '', '系统管理员', '1', '2021-05-12 23:24:36', '系统管理员', '1', '2021-07-04 00:34:23');
@@ -5713,9 +5721,11 @@ INSERT INTO `sys_menu` VALUES ('1000013', '1000013', 'SysGenerateCode', '编号�
 INSERT INTO `sys_menu` VALUES ('1000014', '1000014', 'SysNotifyGroup', '消息通知组', NULL, 0, '/system/notify-group/index', NULL, '1000', '2', '/notify-group', 0, 1, 0, 'system:notify-group:query', 1, 1, '', '系统管理员', '1', '2021-05-08 18:37:01', '系统管理员', '1', '2021-12-09 17:54:42');
 INSERT INTO `sys_menu` VALUES ('1000014001', '1000014001', '', '新增消息通知组', NULL, 0, '', NULL, '1000014', '8', '', 0, 2, 0, 'system:notify-group:add', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('1000014002', '1000014002', '', '修改消息通知组', NULL, 0, '', NULL, '1000014', '8', '', 0, 2, 0, 'system:notify-group:modify', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2021-07-04 00:34:23');
+INSERT INTO `sys_menu` VALUES ('1000014003', '1000014003', '', '删除消息通知组', NULL, 0, '', NULL, '1000014', '8', '', 0, 2, 0, 'system:notify-group:delete', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2025-01-19 18:36:11');
 INSERT INTO `sys_menu` VALUES ('1000015', '1000015', 'UserGroup', '用户分组', NULL, 0, '/system/user-group/index', NULL, '1000', '2', '/user-group', 0, 1, 0, 'system:user-group:query', 1, 1, '', '系统管理员', '1', '2021-05-08 18:37:01', '系统管理员', '1', '2025-01-19 18:36:11');
 INSERT INTO `sys_menu` VALUES ('1000015001', '1000015001', '', '新增用户分组', NULL, 0, '', NULL, '1000015', '8', '', 0, 2, 0, 'system:user-group:add', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2025-01-19 18:36:11');
 INSERT INTO `sys_menu` VALUES ('1000015002', '1000015002', '', '修改用户分组', NULL, 0, '', NULL, '1000015', '8', '', 0, 2, 0, 'system:user-group:modify', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2025-01-19 18:36:11');
+INSERT INTO `sys_menu` VALUES ('1000015003', '1000015003', '', '删除用户分组', NULL, 0, '', NULL, '1000015', '8', '', 0, 2, 0, 'system:user-group:delete', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2025-01-19 18:36:11');
 INSERT INTO `sys_menu` VALUES ('1001', '1001', 'Platform', '平台管理', 'ant-design:global-outlined', NULL, '', NULL, NULL, '1', '/platform', 0, 0, 0, '', 1, 1, '', '系统管理员', '1', '2021-07-04 00:22:05', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('1001001', '1001001', 'OnelineCode', '在线开发', NULL, 0, '/iframes/index', NULL, '1001', '1', '/online-code?src=${magic-api.base-url}${magic-api.web}/index.html', 0, 1, 0, 'system:online-code:config', 1, 1, '', '系统管理员', '1', '2021-05-08 18:37:01', '系统管理员', '1', '2021-12-09 17:54:42');
 INSERT INTO `sys_menu` VALUES ('1002', '1002', 'MsgCenter', '消息中心', 'ant-design:message-outlined', NULL, '', NULL, NULL, '2', '/msg-center', 0, 0, 0, '', 1, 1, '', '系统管理员', '1', '2021-07-04 00:22:05', '系统管理员', '1', '2021-07-04 00:34:23');
@@ -5732,33 +5742,41 @@ INSERT INTO `sys_menu` VALUES ('2000002', '2000002', 'StoreCenterInfo', '仓库�
 INSERT INTO `sys_menu` VALUES ('2000002001', '2000002001', '', '新增仓库', NULL, 0, '', NULL, '2000002', '3', '', 0, 2, 0, 'base-data:store-center:add', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2000002002', '2000002002', '', '修改仓库', NULL, 0, '', NULL, '2000002', '3', '', 0, 2, 0, 'base-data:store-center:modify', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2000002003', '2000002003', '', '导入仓库', NULL, 0, '', NULL, '2000002', '3', '', 0, 2, 0, 'base-data:store-center:import', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
+INSERT INTO `sys_menu` VALUES ('2000002004', '2000002004', '', '删除仓库', NULL, 0, '', NULL, '2000002', '3', '', 0, 2, 0, 'base-data:store-center:delete', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2000004', '2000004', 'Customer', '客户信息', NULL, 0, '/base-data/customer/index', NULL, '2000', '3', '/customer', 0, 1, 0, 'base-data:customer:query', 1, 1, '', '系统管理员', '1', '2021-07-05 21:59:35', '系统管理员', '1', '2021-07-05 21:59:36');
 INSERT INTO `sys_menu` VALUES ('2000004001', '2000004001', '', '新增客户', NULL, 0, '', NULL, '2000004', '3', '', 0, 2, 0, 'base-data:customer:add', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2000004002', '2000004002', '', '修改客户', NULL, 0, '', NULL, '2000004', '3', '', 0, 2, 0, 'base-data:customer:modify', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2000004003', '2000004003', '', '导入客户', NULL, 0, '', NULL, '2000004', '3', '', 0, 2, 0, 'base-data:customer:import', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
+INSERT INTO `sys_menu` VALUES ('2000004004', '2000004004', '', '删除客户', NULL, 0, '', NULL, '2000004', '3', '', 0, 2, 0, 'base-data:customer:delete', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2000005', '2000005', 'Supplier', '供应商信息', NULL, 0, '/base-data/supplier/index', NULL, '2000', '3', '/supplier', 0, 1, 0, 'base-data:supplier:query', 1, 1, '', '系统管理员', '1', '2021-07-05 21:59:35', '系统管理员', '1', '2021-07-05 21:59:36');
 INSERT INTO `sys_menu` VALUES ('2000005001', '2000005001', '', '新增供应商', NULL, 0, '', NULL, '2000005', '3', '', 0, 2, 0, 'base-data:supplier:add', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2000005002', '2000005002', '', '修改供应商', NULL, 0, '', NULL, '2000005', '3', '', 0, 2, 0, 'base-data:supplier:modify', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2000005003', '2000005003', '', '导入供应商', NULL, 0, '', NULL, '2000005', '3', '', 0, 2, 0, 'base-data:supplier:import', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
+INSERT INTO `sys_menu` VALUES ('2000005004', '2000005004', '', '删除供应商', NULL, 0, '', NULL, '2000005', '3', '', 0, 2, 0, 'base-data:supplier:delete', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2000006', '2000006', 'Member', '会员信息', NULL, 0, '/base-data/member/index', NULL, '2000', '3', '/member', 0, 1, 0, 'base-data:member:query', 1, 1, '', '系统管理员', '1', '2021-07-05 21:59:35', '系统管理员', '1', '2021-07-05 21:59:36');
 INSERT INTO `sys_menu` VALUES ('2000006001', '2000006001', '', '新增会员', NULL, 0, '', NULL, '2000006', '3', '', 0, 2, 0, 'base-data:member:add', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2000006002', '2000006002', '', '修改会员', NULL, 0, '', NULL, '2000006', '3', '', 0, 2, 0, 'base-data:member:modify', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2000006003', '2000006003', '', '导入会员', NULL, 0, '', NULL, '2000006', '3', '', 0, 2, 0, 'base-data:member:import', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
+INSERT INTO `sys_menu` VALUES ('2000006004', '2000006004', '', '删除会员', NULL, 0, '', NULL, '2000006', '3', '', 0, 2, 0, 'base-data:member:delete', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2000007', '2000007', 'Shop', '门店信息', NULL, 0, '/base-data/shop/index', NULL, '2000', '3', '/shop', 0, 1, 0, 'base-data:shop:query', 1, 1, '', '系统管理员', '1', '2021-07-05 21:59:35', '系统管理员', '1', '2021-07-05 21:59:36');
 INSERT INTO `sys_menu` VALUES ('2000007001', '2000007001', '', '新增门店', NULL, 0, '', NULL, '2000007', '3', '', 0, 2, 0, 'base-data:shop:add', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2000007002', '2000007002', '', '修改门店', NULL, 0, '', NULL, '2000007', '3', '', 0, 2, 0, 'base-data:shop:modify', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2000007003', '2000007003', '', '导入门店', NULL, 0, '', NULL, '2000007', '3', '', 0, 2, 0, 'base-data:shop:import', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
+INSERT INTO `sys_menu` VALUES ('2000007004', '2000007004', '', '删除门店', NULL, 0, '', NULL, '2000007', '3', '', 0, 2, 0, 'base-data:shop:delete', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2000008', '2000008', 'PayType', '支付方式', NULL, 0, '/base-data/pay-type/index', NULL, '2000', '3', '/pay-type', 0, 1, 0, 'base-data:pay-type:query', 1, 1, '', '系统管理员', '1', '2021-07-05 21:59:35', '系统管理员', '1', '2021-07-05 21:59:36');
 INSERT INTO `sys_menu` VALUES ('2000008001', '2000008001', '', '新增支付方式', NULL, 0, '', NULL, '2000008', '3', '', 0, 2, 0, 'base-data:pay-type:add', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2000008002', '2000008002', '', '修改支付方式', NULL, 0, '', NULL, '2000008', '3', '', 0, 2, 0, 'base-data:pay-type:modify', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
+INSERT INTO `sys_menu` VALUES ('2000008003', '2000008003', '', '删除支付方式', NULL, 0, '', NULL, '2000008', '3', '', 0, 2, 0, 'base-data:pay-type:delete', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2000009', '2000009', 'Address', '地址库', NULL, 0, '/base-data/address/index', NULL, '2000', '15', '/address', 0, 1, 0, 'base-data:address:query', 1, 1, '', '系统管理员', '1', '2021-07-05 21:59:35', '系统管理员', '1', '2021-07-05 21:59:36');
 INSERT INTO `sys_menu` VALUES ('2000009001', '2000009001', '', '新增地址', NULL, 0, '', NULL, '2000009', '15', '', 0, 2, 0, 'base-data:address:add', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2000009002', '2000009002', '', '修改地址', NULL, 0, '', NULL, '2000009', '15', '', 0, 2, 0, 'base-data:address:modify', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2000009003', '2000009003', '', '导出地址', NULL, 0, '', NULL, '2000009', '15', '', 0, 2, 0, 'base-data:address:export', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2000009004', '2000009004', '', '导入地址', NULL, 0, '', NULL, '2000009', '15', '', 0, 2, 0, 'base-data:address:import', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
+INSERT INTO `sys_menu` VALUES ('2000009005', '2000009005', '', '删除地址', NULL, 0, '', NULL, '2000009', '15', '', 0, 2, 0, 'base-data:address:delete', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2000010', '2000010', 'LogisticsCompany', '物流公司', NULL, 0, '/base-data/logistics/company/index', NULL, '2000', '15', '/logistics/company', 0, 1, 0, 'base-data:logistics-company:query', 1, 1, '', '系统管理员', '1', '2021-07-05 21:59:35', '系统管理员', '1', '2021-07-05 21:59:36');
 INSERT INTO `sys_menu` VALUES ('2000010001', '2000010001', '', '新增物流公司', NULL, 0, '', NULL, '2000010', '15', '', 0, 2, 0, 'base-data:logistics-company:add', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2000010002', '2000010002', '', '修改物流公司', NULL, 0, '', NULL, '2000010', '15', '', 0, 2, 0, 'base-data:logistics-company:modify', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
+INSERT INTO `sys_menu` VALUES ('2000010003', '2000010003', '', '删除物流公司', NULL, 0, '', NULL, '2000010', '15', '', 0, 2, 0, 'base-data:logistics-company:delete', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2000011', '2000011', 'PrintTemplate', '打印模板', NULL, 0, '/base-data/print-template/index', NULL, '2000', '15', '/print-template', 0, 1, 0, 'base-data:print-template:query', 1, 1, '', '系统管理员', '1', '2021-07-05 21:59:35', '系统管理员', '1', '2021-07-05 21:59:36');
 INSERT INTO `sys_menu` VALUES ('2000011001', '2000011001', '', '新增打印模板', NULL, 0, '', NULL, '2000011', '15', '', 0, 2, 0, 'base-data:print-template:add', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2000011002', '2000011002', '', '修改打印模板', NULL, 0, '', NULL, '2000011', '15', '', 0, 2, 0, 'base-data:print-template:modify', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
@@ -5767,20 +5785,25 @@ INSERT INTO `sys_menu` VALUES ('2001001', '2001001', 'ProductCategory', '商品�
 INSERT INTO `sys_menu` VALUES ('2001001001', '2001001001', '', '新增分类', NULL, 0, '', NULL, '2001001', '4', '', 0, 2, 0, 'base-data:product:category:add', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2001001002', '2001001002', '', '修改分类', NULL, 0, '', NULL, '2001001', '4', '', 0, 2, 0, 'base-data:product:category:modify', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2001001003', '2001001003', '', '导入分类', NULL, 0, '', NULL, '2001001', '4', '', 0, 2, 0, 'base-data:product:category:import', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
+INSERT INTO `sys_menu` VALUES ('2001001004', '2001001004', '', '删除分类', NULL, 0, '', NULL, '2001001', '4', '', 0, 2, 0, 'base-data:product:category:delete', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2001002', '2001002', 'ProductBrand', '商品品牌', NULL, 0, '/base-data/product/brand/index', NULL, '2001', '4', '/brand', 0, 1, 0, 'base-data:product:brand:query', 1, 1, '', '系统管理员', '1', '2021-07-06 17:01:00', '系统管理员', '1', '2021-07-06 17:01:00');
 INSERT INTO `sys_menu` VALUES ('2001002001', '2001002001', '', '新增品牌', NULL, 0, '', NULL, '2001002', '4', '', 0, 2, 0, 'base-data:product:brand:add', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2001002002', '2001002002', '', '修改品牌', NULL, 0, '', NULL, '2001002', '4', '', 0, 2, 0, 'base-data:product:brand:modify', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2001002003', '2001002003', '', '导入品牌', NULL, 0, '', NULL, '2001002', '4', '', 0, 2, 0, 'base-data:product:brand:import', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
+INSERT INTO `sys_menu` VALUES ('2001002004', '2001002004', '', '删除品牌', NULL, 0, '', NULL, '2001002', '4', '', 0, 2, 0, 'base-data:product:brand:delete', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2001004', '2001004', 'ProductProperty', '商品属性', NULL, 0, '/base-data/product/property/index', NULL, '2001', '4', '/property', 0, 1, 0, 'base-data:product:property:query', 1, 1, '', '系统管理员', '1', '2021-07-06 17:01:00', '系统管理员', '1', '2021-07-06 17:01:00');
 INSERT INTO `sys_menu` VALUES ('2001004001', '2001004001', '', '新增属性', NULL, 0, '', NULL, '2001004', '4', '', 0, 2, 0, 'base-data:product:property:add', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2001004002', '2001004002', '', '修改属性', NULL, 0, '', NULL, '2001004', '4', '', 0, 2, 0, 'base-data:product:property:modify', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2001004003', '2001004003', '', '查询属性值', NULL, 0, '', NULL, '2001004', '4', '', 0, 2, 0, 'base-data:product:property-item:query', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2001004004', '2001004004', '', '新增属性值', NULL, 0, '', NULL, '2001004', '4', '', 0, 2, 0, 'base-data:product:property-item:add', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2001004005', '2001004005', '', '修改属性值', NULL, 0, '', NULL, '2001004', '4', '', 0, 2, 0, 'base-data:product:property-item:modify', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
+INSERT INTO `sys_menu` VALUES ('2001004006', '2001004006', '', '删除属性', NULL, 0, '', NULL, '2001004', '4', '', 0, 2, 0, 'base-data:product:property:delete', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
+INSERT INTO `sys_menu` VALUES ('2001004007', '2001004007', '', '删除属性值', NULL, 0, '', NULL, '2001004', '4', '', 0, 2, 0, 'base-data:product:property-item:delete', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2001005', '2001005', 'ProductInfo', '商品管理', NULL, 0, '/base-data/product/info/index', NULL, '2001', '4', '/info', 0, 1, 0, 'base-data:product:info:query', 1, 1, '', '系统管理员', '1', '2021-07-06 17:01:00', '系统管理员', '1', '2021-07-06 17:01:00');
 INSERT INTO `sys_menu` VALUES ('2001005001', '2001005001', '', '新增商品', NULL, 0, '', NULL, '2001005', '4', '', 0, 2, 0, 'base-data:product:info:add', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2001005002', '2001005002', '', '修改商品', NULL, 0, '', NULL, '2001005', '4', '', 0, 2, 0, 'base-data:product:info:modify', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2001005003', '2001005003', '', '导入商品', NULL, 0, '', NULL, '2001005', '4', '', 0, 2, 0, 'base-data:product:info:import', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
+INSERT INTO `sys_menu` VALUES ('2001005004', '2001005004', '', '删除商品', NULL, 0, '', NULL, '2001005', '4', '', 0, 2, 0, 'base-data:product:info:delete', 1, 1, '', '系统管理员', '1', '2021-05-12 23:23:33', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('2002', '2002', 'Purchase', '采购管理', 'ant-design:money-collect-outlined', NULL, '', NULL, NULL, '5', '/purchase', 0, 0, 0, '', 1, 1, '', '系统管理员', '1', '2021-07-05 01:21:35', '系统管理员', '1', '2021-07-05 01:21:39');
 INSERT INTO `sys_menu` VALUES ('2002001', '2002001', 'PurchaseConfig', '采购参数设置', NULL, 0, '/sc/purchase/config/index', NULL, '2002', '5', '/config', 1, 1, 0, 'purchase:config:modify', 1, 1, '', '系统管理员', '1', '2021-07-05 21:59:35', '系统管理员', '1', '2021-07-05 21:59:36');
 INSERT INTO `sys_menu` VALUES ('2002002', '2002002', 'PurchaseOrder', '采购订单管理', NULL, 0, '/sc/purchase/order/index', NULL, '2002', '5', '/order', 0, 1, 0, 'purchase:order:query', 1, 1, '', '系统管理员', '1', '2021-07-05 21:59:35', '系统管理员', '1', '2021-07-05 21:59:36');
@@ -5868,6 +5891,7 @@ INSERT INTO `sys_menu` VALUES ('3000005', '3000005', 'StockAdjust', '库存调�
 INSERT INTO `sys_menu` VALUES ('3000005002', '3000005002', 'StockAdjustReason', '库存调整原因', NULL, 0, '/sc/stock/adjust/stock/reason/index', NULL, '3000005', '10', '/stock/reason', 0, 1, 0, 'stock:adjust:reason:query', 1, 1, '', '系统管理员', '1', '2021-07-05 21:59:35', '系统管理员', '1', '2021-07-05 21:59:36');
 INSERT INTO `sys_menu` VALUES ('3000005002001', '3000005002001', '', '新增库存调整原因', NULL, 0, '', NULL, '3000005002', '10', '', 0, 2, 0, 'stock:adjust:reason:add', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('3000005002002', '3000005002002', '', '修改库存调整原因', NULL, 0, '', NULL, '3000005002', '10', '', 0, 2, 0, 'stock:adjust:reason:modify', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2021-07-04 00:34:23');
+INSERT INTO `sys_menu` VALUES ('3000005002003', '3000005002003', '', '删除库存调整原因', NULL, 0, '', NULL, '3000005002', '10', '', 0, 2, 0, 'stock:adjust:reason:delete', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('3000005003', '3000005003', 'StockAdjustSheet', '库存调整', NULL, 0, '/sc/stock/adjust/stock/index', NULL, '3000005', '10', '/stock', 0, 1, 0, 'stock:adjust:query', 1, 1, '', '系统管理员', '1', '2021-07-05 21:59:35', '系统管理员', '1', '2021-07-05 21:59:36');
 INSERT INTO `sys_menu` VALUES ('3000005003001', '3000005003001', '', '新增库存调整单', NULL, 0, '', NULL, '3000005003', '10', '', 0, 2, 0, 'stock:adjust:add', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('3000005003002', '3000005003002', '', '修改库存调整单', NULL, 0, '', NULL, '3000005003', '10', '', 0, 2, 0, 'stock:adjust:modify', 1, 1, '', '系统管理员', '1', '2021-05-12 22:50:27', '系统管理员', '1', '2021-07-04 00:34:23');
@@ -5892,10 +5916,12 @@ INSERT INTO `sys_menu` VALUES ('4000001', '4000001', 'SettleInItem', '收入项�
 INSERT INTO `sys_menu` VALUES ('4000001001', '4000001001', '', '新增收入项目', NULL, 0, '', NULL, '4000001', '11', '', 0, 2, 0, 'settle:in-item:add', 1, 1, '', '系统管理员', '1', '2021-05-12 10:53:45', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('4000001002', '4000001002', '', '修改收入项目', NULL, 0, '', NULL, '4000001', '11', '', 0, 2, 0, 'settle:in-item:modify', 1, 1, '', '系统管理员', '1', '2021-05-12 10:53:45', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('4000001003', '4000001003', '', '导出收入项目', NULL, 0, '', NULL, '4000001', '11', '', 0, 2, 0, 'settle:in-item:export', 1, 1, '', '系统管理员', '1', '2021-05-12 10:53:45', '系统管理员', '1', '2021-07-04 00:34:23');
+INSERT INTO `sys_menu` VALUES ('4000001004', '4000001004', '', '删除收入项目', NULL, 0, '', NULL, '4000001', '11', '', 0, 2, 0, 'settle:in-item:delete', 1, 1, '', '系统管理员', '1', '2021-05-12 10:53:45', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('4000002', '4000002', 'SettleOutItem', '支出项目', NULL, 0, '/settle/out-item/index', NULL, '4000', '11', '/out-item', 0, 1, 0, 'settle:out-item:query', 1, 1, '', '系统管理员', '1', '2021-07-05 21:59:35', '系统管理员', '1', '2021-07-05 21:59:36');
 INSERT INTO `sys_menu` VALUES ('4000002001', '4000002001', '', '新增支出项目', NULL, 0, '', NULL, '4000002', '11', '', 0, 2, 0, 'settle:out-item:add', 1, 1, '', '系统管理员', '1', '2021-05-12 10:53:45', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('4000002002', '4000002002', '', '修改支出项目', NULL, 0, '', NULL, '4000002', '11', '', 0, 2, 0, 'settle:out-item:modify', 1, 1, '', '系统管理员', '1', '2021-05-12 10:53:45', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('4000002003', '4000002003', '', '导出支出项目', NULL, 0, '', NULL, '4000002', '11', '', 0, 2, 0, 'settle:out-item:export', 1, 1, '', '系统管理员', '1', '2021-05-12 10:53:45', '系统管理员', '1', '2021-07-04 00:34:23');
+INSERT INTO `sys_menu` VALUES ('4000002004', '4000002004', '', '删除支出项目', NULL, 0, '', NULL, '4000002', '11', '', 0, 2, 0, 'settle:out-item:delete', 1, 1, '', '系统管理员', '1', '2021-05-12 10:53:45', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('4000003', '4000003', 'SettleFeeSheet', '供应商费用', NULL, 0, '/settle/fee-sheet/index', NULL, '4000007', '11', '/fee-sheet', 0, 1, 0, 'settle:fee-sheet:query', 1, 1, '', '系统管理员', '1', '2021-07-05 21:59:35', '系统管理员', '1', '2021-07-05 21:59:36');
 INSERT INTO `sys_menu` VALUES ('4000003001', '4000003001', '', '新增供应商费用单', NULL, 0, '', NULL, '4000003', '11', '', 0, 2, 0, 'settle:fee-sheet:add', 1, 1, '', '系统管理员', '1', '2021-05-12 10:53:45', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('4000003002', '4000003002', '', '修改供应商费用单', NULL, 0, '', NULL, '4000003', '11', '', 0, 2, 0, 'settle:fee-sheet:modify', 1, 1, '', '系统管理员', '1', '2021-05-12 10:53:45', '系统管理员', '1', '2021-07-04 00:34:23');
@@ -5954,13 +5980,8 @@ INSERT INTO `sys_menu` VALUES ('5000001003', '5000001003', '', '删除物流单'
 INSERT INTO `sys_menu` VALUES ('5000001004', '5000001004', '', '物流单发货', NULL, 0, '', NULL, '5000001', '15', '', 0, 2, 0, 'logistics:sheet:delivery', 1, 1, '', '系统管理员', '1', '2021-05-12 23:24:36', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('5000001005', '5000001005', '', '导入物流单', NULL, 0, '', NULL, '5000001', '15', '', 0, 2, 0, 'logistics:sheet:import', 1, 1, '', '系统管理员', '1', '2021-05-12 23:24:36', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('5000001006', '5000001006', '', '导出物流单', NULL, 0, '', NULL, '5000001', '15', '', 0, 2, 0, 'logistics:sheet:export', 1, 1, '', '系统管理员', '1', '2021-05-12 23:24:36', '系统管理员', '1', '2021-07-04 00:34:23');
-INSERT INTO `sys_menu` VALUES ('9000', '9000', 'Development', '开发管理', 'ant-design:tool-outlined', NULL, '', NULL, NULL, '12', '/development', 0, 0, 0, '', 1, 1, '', '系统管理员', '1', '2021-07-04 00:22:05', '系统管理员', '1', '2021-07-04 00:34:23');
+INSERT INTO `sys_menu` VALUES ('9000', '9000', 'Development', '开发管理', NULL, NULL, '', NULL, '1001', '12', '/development', 0, 0, 0, '', 1, 1, '', '系统管理员', '1', '2021-07-04 00:22:05', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('9000001', '9000001', 'Qrtz', '定时器管理', NULL, 0, '/development/qrtz/index', NULL, '9000', '12', '/qrtz', 0, 1, 0, 'development:qrtz:manage', 1, 1, '', '系统管理员', '1', '2021-05-08 18:37:01', '系统管理员', '1', '2021-12-09 17:54:42');
-INSERT INTO `sys_menu` VALUES ('9000002', '9000002', 'DataEntity', '数据实体', NULL, 0, '/development/data/entity/index', NULL, '9000', '12', '/data/entity', 0, 1, 0, '', 1, 1, '', '系统管理员', '1', '2021-05-08 18:37:01', '系统管理员', '1', '2021-12-09 17:54:42');
-INSERT INTO `sys_menu` VALUES ('9000003', '9000003', 'DataObj', '数据对象', NULL, 0, '/development/data/obj/index', NULL, '9000', '12', '/data/obj', 0, 1, 0, '', 1, 1, '', '系统管理员', '1', '2021-05-08 18:37:01', '系统管理员', '1', '2021-12-09 17:54:42');
-INSERT INTO `sys_menu` VALUES ('9000004', '9000004', 'CustomList', '自定义列表', NULL, 0, '/development/custom/list/index', NULL, '9000', '12', '/custom/list', 0, 1, 0, '', 1, 1, '', '系统管理员', '1', '2021-05-08 18:37:01', '系统管理员', '1', '2021-12-09 17:54:42');
-INSERT INTO `sys_menu` VALUES ('9000005', '9000005', 'CustomSelector', '自定义选择器', NULL, 0, '/development/custom/selector/index', NULL, '9000', '12', '/custom/selector', 0, 1, 0, '', 1, 1, '', '系统管理员', '1', '2021-05-08 18:37:01', '系统管理员', '1', '2021-12-09 17:54:42');
-INSERT INTO `sys_menu` VALUES ('9000008', '9000008', 'CustomPage', '自定义页面', NULL, 0, '/development/custom/page/index', NULL, '9000', '12', '/custom/page', 0, 1, 0, '', 1, 1, '', '系统管理员', '1', '2021-05-08 18:37:01', '系统管理员', '1', '2021-12-09 17:54:42');
 INSERT INTO `sys_menu` VALUES ('9001', '9001', 'SmartWork', '便捷办公', 'ant-design:read-outlined', NULL, '', NULL, NULL, '13', '/smart-work', 0, 0, 0, '', 1, 1, '', '系统管理员', '1', '2021-07-04 00:22:05', '系统管理员', '1', '2021-07-04 00:34:23');
 INSERT INTO `sys_menu` VALUES ('9001001', '9001001', 'FileBox', '文件收纳箱', NULL, 0, '/smart-work/file-box/index', NULL, '9001', '13', '/file-box', 0, 1, 0, '', 1, 1, '', '系统管理员', '1', '2021-05-08 18:37:01', '系统管理员', '1', '2021-12-09 17:54:42');
 
@@ -6043,7 +6064,7 @@ CREATE TABLE `sys_notify_group`  (
   `update_time` datetime NOT NULL COMMENT '修改时间',
   `available` tinyint(1) NOT NULL COMMENT '状态',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `name`(`name`) USING BTREE
+  INDEX `name`(`name`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '消息通知组' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -6123,9 +6144,9 @@ CREATE TABLE `sys_role`  (
   `update_by_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '修改人ID',
   `update_time` datetime NOT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `code`(`code`) USING BTREE,
-  UNIQUE INDEX `name`(`name`) USING BTREE,
-  INDEX `category_id`(`category_id`) USING BTREE
+  INDEX `category_id`(`category_id`) USING BTREE,
+  INDEX `code`(`code`) USING BTREE,
+  INDEX `name`(`name`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '角色' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -6223,8 +6244,8 @@ CREATE TABLE `sys_user`  (
   `update_by_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '修改人ID',
   `update_time` datetime NOT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `code`(`code`) USING BTREE,
-  UNIQUE INDEX `username`(`username`) USING BTREE
+  INDEX `code`(`code`) USING BTREE,
+  INDEX `username`(`username`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -6266,8 +6287,8 @@ CREATE TABLE `sys_user_group`  (
   `update_time` datetime NOT NULL COMMENT '修改时间',
   `available` tinyint(1) NOT NULL COMMENT '状态',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `name`(`name`) USING BTREE,
-  UNIQUE INDEX `code`(`code`) USING BTREE
+  INDEX `name`(`name`) USING BTREE,
+  INDEX `code`(`code`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户组' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -7660,7 +7681,7 @@ CREATE TABLE `tbl_shop`  (
   `update_by_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '修改人ID',
   `update_time` datetime NOT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `code`(`code`) USING BTREE
+  INDEX `code`(`code`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '门店' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -7684,7 +7705,7 @@ CREATE TABLE `tbl_stock_adjust_reason`  (
   `update_by_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '修改人ID',
   `update_time` datetime NOT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `code`(`code`) USING BTREE
+  INDEX `code`(`code`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '库存调整原因' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
