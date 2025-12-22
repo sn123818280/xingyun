@@ -30,10 +30,4 @@ public class QueryProductPropertyItemVo extends PageVo implements BaseVo, Serial
   @ApiModelProperty(value = "属性ID", required = true)
   @NotBlank(message = "属性ID不能为空！")
   private String propertyId;
-
-  /**
-   * 状态
-   */
-  @ApiModelProperty("状态")
-  private Boolean available;
 }

@@ -9,25 +9,27 @@ import com.lframework.starter.common.exceptions.impl.DefaultClientException;
 import com.lframework.starter.common.utils.Assert;
 import com.lframework.starter.common.utils.ObjectUtil;
 import com.lframework.starter.common.utils.StringUtil;
-import com.lframework.starter.web.core.impl.BaseMpServiceImpl;
+import com.lframework.starter.web.core.annotations.oplog.OpLog;
 import com.lframework.starter.web.core.components.resp.PageResult;
+import com.lframework.starter.web.core.event.DataChangeEventBuilder;
+import com.lframework.starter.web.core.impl.BaseMpServiceImpl;
 import com.lframework.starter.web.core.utils.EnumUtil;
 import com.lframework.starter.web.core.utils.IdUtil;
+import com.lframework.starter.web.core.utils.OpLogUtil;
 import com.lframework.starter.web.core.utils.PageHelperUtil;
 import com.lframework.starter.web.core.utils.PageResultUtil;
+import com.lframework.starter.web.inner.dto.dic.city.DicCityDto;
+import com.lframework.starter.web.inner.service.DicCityService;
 import com.lframework.xingyun.basedata.entity.Customer;
 import com.lframework.xingyun.basedata.enums.BaseDataOpLogType;
 import com.lframework.xingyun.basedata.enums.SettleType;
+import com.lframework.xingyun.basedata.events.DeleteCustomerEvent;
 import com.lframework.xingyun.basedata.mappers.CustomerMapper;
 import com.lframework.xingyun.basedata.service.customer.CustomerService;
 import com.lframework.xingyun.basedata.vo.customer.CreateCustomerVo;
 import com.lframework.xingyun.basedata.vo.customer.QueryCustomerSelectorVo;
 import com.lframework.xingyun.basedata.vo.customer.QueryCustomerVo;
 import com.lframework.xingyun.basedata.vo.customer.UpdateCustomerVo;
-import com.lframework.starter.web.core.annotations.oplog.OpLog;
-import com.lframework.starter.web.inner.dto.dic.city.DicCityDto;
-import com.lframework.starter.web.inner.service.DicCityService;
-import com.lframework.starter.web.core.utils.OpLogUtil;
 import java.io.Serializable;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,24 +84,19 @@ public class CustomerServiceImpl extends BaseMpServiceImpl<CustomerMapper, Custo
     return PageResultUtil.convert(new PageInfo<>(datas));
   }
 
-  @OpLog(type = BaseDataOpLogType.class, name = "停用客户，ID：{}", params = "#id")
+  @OpLog(type = BaseDataOpLogType.class, name = "删除客户，ID：{}", params = "#id")
   @Transactional(rollbackFor = Exception.class)
   @Override
-  public void unable(String id) {
+  public void deleteById(String id) {
 
     Wrapper<Customer> updateWrapper = Wrappers.lambdaUpdate(Customer.class)
-        .set(Customer::getAvailable, Boolean.FALSE).eq(Customer::getId, id);
+        .set(Customer::getAvailable, Boolean.FALSE)
+        .eq(Customer::getId, id);
     getBaseMapper().update(updateWrapper);
-  }
 
-  @OpLog(type = BaseDataOpLogType.class, name = "启用客户，ID：{}", params = "#id")
-  @Transactional(rollbackFor = Exception.class)
-  @Override
-  public void enable(String id) {
+    Customer record = this.findById(id);
 
-    Wrapper<Customer> updateWrapper = Wrappers.lambdaUpdate(Customer.class)
-        .set(Customer::getAvailable, Boolean.TRUE).eq(Customer::getId, id);
-    getBaseMapper().update(updateWrapper);
+    DataChangeEventBuilder.publishLogicDelete(this, DeleteCustomerEvent.class, record);
   }
 
   @OpLog(type = BaseDataOpLogType.class, name = "新增客户，ID：{}, 编号：{}", params = {"#id",
@@ -109,7 +106,8 @@ public class CustomerServiceImpl extends BaseMpServiceImpl<CustomerMapper, Custo
   public String create(CreateCustomerVo vo) {
 
     Wrapper<Customer> checkWrapper = Wrappers.lambdaQuery(Customer.class)
-        .eq(Customer::getCode, vo.getCode());
+        .eq(Customer::getCode, vo.getCode())
+        .eq(Customer::getAvailable, Boolean.TRUE);
     if (getBaseMapper().selectCount(checkWrapper) > 0) {
       throw new DefaultClientException("编号重复，请重新输入！");
     }
@@ -187,6 +185,7 @@ public class CustomerServiceImpl extends BaseMpServiceImpl<CustomerMapper, Custo
 
     Wrapper<Customer> checkWrapper = Wrappers.lambdaQuery(Customer.class)
         .eq(Customer::getCode, vo.getCode())
+        .eq(Customer::getAvailable, Boolean.TRUE)
         .ne(Customer::getId, vo.getId());
     if (getBaseMapper().selectCount(checkWrapper) > 0) {
       throw new DefaultClientException("编号重复，请重新输入！");
@@ -212,7 +211,7 @@ public class CustomerServiceImpl extends BaseMpServiceImpl<CustomerMapper, Custo
             !StringUtil.isBlank(vo.getAccountName()) ? vo.getAccountName() : null)
         .set(Customer::getAccountNo,
             !StringUtil.isBlank(vo.getAccountNo()) ? vo.getAccountNo() : null)
-        .set(Customer::getAvailable, vo.getAvailable()).set(Customer::getDescription,
+        .set(Customer::getDescription,
             StringUtil.isBlank(vo.getDescription()) ? StringPool.EMPTY_STR : vo.getDescription())
         .eq(Customer::getId, vo.getId());
 

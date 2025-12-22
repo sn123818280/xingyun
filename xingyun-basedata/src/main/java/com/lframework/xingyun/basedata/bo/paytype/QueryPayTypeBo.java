@@ -30,12 +30,6 @@ public class QueryPayTypeBo extends BaseBo<PayType> {
   private String name;
 
   /**
-   * 状态
-   */
-  @ApiModelProperty("状态")
-  private Boolean available;
-
-  /**
    * 备注
    */
   @ApiModelProperty("备注")

@@ -9,26 +9,29 @@ import com.lframework.starter.common.exceptions.impl.DefaultClientException;
 import com.lframework.starter.common.utils.Assert;
 import com.lframework.starter.common.utils.ObjectUtil;
 import com.lframework.starter.common.utils.StringUtil;
-import com.lframework.starter.web.core.impl.BaseMpServiceImpl;
+import com.lframework.starter.web.core.annotations.oplog.OpLog;
 import com.lframework.starter.web.core.components.resp.PageResult;
+import com.lframework.starter.web.core.event.DataChangeEventBuilder;
+import com.lframework.starter.web.core.impl.BaseMpServiceImpl;
+import com.lframework.starter.web.core.utils.ApplicationUtil;
 import com.lframework.starter.web.core.utils.EnumUtil;
 import com.lframework.starter.web.core.utils.IdUtil;
+import com.lframework.starter.web.core.utils.OpLogUtil;
 import com.lframework.starter.web.core.utils.PageHelperUtil;
 import com.lframework.starter.web.core.utils.PageResultUtil;
+import com.lframework.starter.web.inner.dto.dic.city.DicCityDto;
+import com.lframework.starter.web.inner.service.DicCityService;
 import com.lframework.xingyun.basedata.entity.Supplier;
 import com.lframework.xingyun.basedata.enums.BaseDataOpLogType;
 import com.lframework.xingyun.basedata.enums.ManageType;
 import com.lframework.xingyun.basedata.enums.SettleType;
+import com.lframework.xingyun.basedata.events.DeleteSupplierEvent;
 import com.lframework.xingyun.basedata.mappers.SupplierMapper;
 import com.lframework.xingyun.basedata.service.supplier.SupplierService;
 import com.lframework.xingyun.basedata.vo.supplier.CreateSupplierVo;
 import com.lframework.xingyun.basedata.vo.supplier.QuerySupplierSelectorVo;
 import com.lframework.xingyun.basedata.vo.supplier.QuerySupplierVo;
 import com.lframework.xingyun.basedata.vo.supplier.UpdateSupplierVo;
-import com.lframework.starter.web.core.annotations.oplog.OpLog;
-import com.lframework.starter.web.inner.dto.dic.city.DicCityDto;
-import com.lframework.starter.web.inner.service.DicCityService;
-import com.lframework.starter.web.core.utils.OpLogUtil;
 import java.io.Serializable;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,24 +72,19 @@ public class SupplierServiceImpl extends BaseMpServiceImpl<SupplierMapper, Suppl
     return getBaseMapper().selectById(id);
   }
 
-  @OpLog(type = BaseDataOpLogType.class, name = "停用供应商，ID：{}", params = "#id")
+  @OpLog(type = BaseDataOpLogType.class, name = "删除供应商，ID：{}", params = "#id")
   @Transactional(rollbackFor = Exception.class)
   @Override
-  public void unable(String id) {
+  public void deleteById(String id) {
 
     Wrapper<Supplier> updateWrapper = Wrappers.lambdaUpdate(Supplier.class)
-        .set(Supplier::getAvailable, Boolean.FALSE).eq(Supplier::getId, id);
+        .set(Supplier::getAvailable, Boolean.FALSE)
+        .eq(Supplier::getId, id);
     getBaseMapper().update(updateWrapper);
-  }
 
-  @OpLog(type = BaseDataOpLogType.class, name = "启用供应商，ID：{}", params = "#id")
-  @Transactional(rollbackFor = Exception.class)
-  @Override
-  public void enable(String id) {
+    Supplier record = this.findById(id);
 
-    Wrapper<Supplier> updateWrapper = Wrappers.lambdaUpdate(Supplier.class)
-        .set(Supplier::getAvailable, Boolean.TRUE).eq(Supplier::getId, id);
-    getBaseMapper().update(updateWrapper);
+    DataChangeEventBuilder.publishLogicDelete(this, DeleteSupplierEvent.class, record);
   }
 
   @OpLog(type = BaseDataOpLogType.class, name = "新增供应商，ID：{}, 编号：{}", params = {"#id",
@@ -96,7 +94,8 @@ public class SupplierServiceImpl extends BaseMpServiceImpl<SupplierMapper, Suppl
   public String create(CreateSupplierVo vo) {
 
     Wrapper<Supplier> checkWrapper = Wrappers.lambdaQuery(Supplier.class)
-        .eq(Supplier::getCode, vo.getCode());
+        .eq(Supplier::getCode, vo.getCode())
+        .eq(Supplier::getAvailable, Boolean.TRUE);
     if (getBaseMapper().selectCount(checkWrapper) > 0) {
       throw new DefaultClientException("编号重复，请重新输入！");
     }
@@ -180,6 +179,7 @@ public class SupplierServiceImpl extends BaseMpServiceImpl<SupplierMapper, Suppl
 
     Wrapper<Supplier> checkWrapper = Wrappers.lambdaQuery(Supplier.class)
         .eq(Supplier::getCode, vo.getCode())
+        .eq(Supplier::getAvailable, Boolean.TRUE)
         .ne(Supplier::getId, vo.getId());
     if (getBaseMapper().selectCount(checkWrapper) > 0) {
       throw new DefaultClientException("编号重复，请重新输入！");
@@ -206,7 +206,7 @@ public class SupplierServiceImpl extends BaseMpServiceImpl<SupplierMapper, Suppl
             !StringUtil.isBlank(vo.getAccountName()) ? vo.getAccountName() : null)
         .set(Supplier::getAccountNo,
             !StringUtil.isBlank(vo.getAccountNo()) ? vo.getAccountNo() : null)
-        .set(Supplier::getAvailable, vo.getAvailable()).set(Supplier::getDescription,
+        .set(Supplier::getDescription,
             StringUtil.isBlank(vo.getDescription()) ? StringPool.EMPTY_STR : vo.getDescription())
         .eq(Supplier::getId, vo.getId());
 

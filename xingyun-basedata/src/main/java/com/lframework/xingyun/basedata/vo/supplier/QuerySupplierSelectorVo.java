@@ -32,9 +32,4 @@ public class QuerySupplierSelectorVo extends PageVo implements BaseVo, Serializa
   @IsEnum(message = "经营方式格式不正确！", enumClass = ManageType.class)
   private Integer manageType;
 
-  /**
-   * 状态
-   */
-  @ApiModelProperty("状态")
-  private Boolean available;
 }

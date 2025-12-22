@@ -30,8 +30,8 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -95,31 +95,15 @@ public class SupplierController extends DefaultBaseController {
   }
 
   /**
-   * 停用供应商
+   * 删除供应商
    */
-  @ApiOperation("停用供应商")
-  @HasPermission({"base-data:supplier:modify"})
-  @PatchMapping("/unable")
-  public InvokeResult<Void> unable(
+  @ApiOperation("删除供应商")
+  @HasPermission({"base-data:supplier:delete"})
+  @DeleteMapping
+  public InvokeResult<Void> deleteById(
       @ApiParam(value = "ID", required = true) @NotEmpty(message = "供应商ID不能为空！") String id) {
 
-    supplierService.unable(id);
-
-    supplierService.cleanCacheByKey(id);
-
-    return InvokeResultBuilder.success();
-  }
-
-  /**
-   * 启用供应商
-   */
-  @ApiOperation("启用供应商")
-  @HasPermission({"base-data:supplier:modify"})
-  @PatchMapping("/enable")
-  public InvokeResult<Void> enable(
-      @ApiParam(value = "ID", required = true) @NotEmpty(message = "供应商ID不能为空！") String id) {
-
-    supplierService.enable(id);
+    supplierService.deleteById(id);
 
     supplierService.cleanCacheByKey(id);
 

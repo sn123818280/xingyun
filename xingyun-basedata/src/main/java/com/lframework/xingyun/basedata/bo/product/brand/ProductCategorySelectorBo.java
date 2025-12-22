@@ -32,12 +32,6 @@ public class ProductCategorySelectorBo extends BaseBo<ProductCategory> {
     @ApiModelProperty("父级ID")
     private String parentId;
 
-    /**
-     * 状态
-     */
-    @ApiModelProperty("状态")
-    private Boolean available;
-
     public ProductCategorySelectorBo() {
 
     }

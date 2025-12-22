@@ -104,9 +104,6 @@ jugg:
     #  cacheName2: 7200
     regions:
       product_stock_warning_notify: 86400
-  #开启多租户
-  tenant:
-    enabled: true
   #开启websocket
   ws:
     enabled: true

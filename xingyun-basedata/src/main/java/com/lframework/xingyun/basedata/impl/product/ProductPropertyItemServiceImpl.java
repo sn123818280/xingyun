@@ -9,15 +9,17 @@ import com.lframework.starter.common.utils.Assert;
 import com.lframework.starter.common.utils.ObjectUtil;
 import com.lframework.starter.common.utils.StringUtil;
 import com.lframework.starter.web.core.annotations.oplog.OpLog;
-import com.lframework.xingyun.basedata.enums.BaseDataOpLogType;
-import com.lframework.starter.web.core.impl.BaseMpServiceImpl;
 import com.lframework.starter.web.core.components.resp.PageResult;
+import com.lframework.starter.web.core.event.DataChangeEventBuilder;
+import com.lframework.starter.web.core.impl.BaseMpServiceImpl;
+import com.lframework.starter.web.core.utils.IdUtil;
 import com.lframework.starter.web.core.utils.OpLogUtil;
 import com.lframework.starter.web.core.utils.PageHelperUtil;
 import com.lframework.starter.web.core.utils.PageResultUtil;
-import com.lframework.starter.web.core.utils.IdUtil;
 import com.lframework.xingyun.basedata.entity.ProductProperty;
 import com.lframework.xingyun.basedata.entity.ProductPropertyItem;
+import com.lframework.xingyun.basedata.enums.BaseDataOpLogType;
+import com.lframework.xingyun.basedata.events.DeleteProductPropertyItemEvent;
 import com.lframework.xingyun.basedata.mappers.ProductPropertyItemMapper;
 import com.lframework.xingyun.basedata.service.product.ProductPropertyItemService;
 import com.lframework.xingyun.basedata.service.product.ProductPropertyService;
@@ -33,123 +35,150 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class ProductPropertyItemServiceImpl extends BaseMpServiceImpl<ProductPropertyItemMapper, ProductPropertyItem>
-        implements ProductPropertyItemService {
+public class ProductPropertyItemServiceImpl extends
+    BaseMpServiceImpl<ProductPropertyItemMapper, ProductPropertyItem>
+    implements ProductPropertyItemService {
 
-    @Autowired
-    private ProductPropertyService productPropertyService;
+  @Autowired
+  private ProductPropertyService productPropertyService;
 
-    @Override
-    public PageResult<ProductPropertyItem> query(Integer pageIndex, Integer pageSize, QueryProductPropertyItemVo vo) {
+  @Override
+  public PageResult<ProductPropertyItem> query(Integer pageIndex, Integer pageSize,
+      QueryProductPropertyItemVo vo) {
 
-        Assert.greaterThanZero(pageIndex);
-        Assert.greaterThanZero(pageSize);
+    Assert.greaterThanZero(pageIndex);
+    Assert.greaterThanZero(pageSize);
 
-        PageHelperUtil.startPage(pageIndex, pageSize);
-        List<ProductPropertyItem> datas = this.query(vo);
+    PageHelperUtil.startPage(pageIndex, pageSize);
+    List<ProductPropertyItem> datas = this.query(vo);
 
-        return PageResultUtil.convert(new PageInfo<>(datas));
+    return PageResultUtil.convert(new PageInfo<>(datas));
+  }
+
+  @Override
+  public List<ProductPropertyItem> query(QueryProductPropertyItemVo vo) {
+
+    return getBaseMapper().query(vo);
+  }
+
+  @Override
+  public List<ProductPropertyItem> getByPropertyId(String propertyId) {
+
+    return getBaseMapper().getByPropertyId(propertyId);
+  }
+
+  @Cacheable(value = ProductPropertyItem.CACHE_NAME, key = "@cacheVariables.tenantId() + #id", unless = "#result == null")
+  @Override
+  public ProductPropertyItem findById(String id) {
+
+    return getBaseMapper().selectById(id);
+  }
+
+  @OpLog(type = BaseDataOpLogType.class, name = "新增商品属性值，ID：{}, 编号：{}", params = {"#id",
+      "#code"})
+  @Transactional(rollbackFor = Exception.class)
+  @Override
+  public String create(CreateProductPropertyItemVo vo) {
+
+    ProductProperty property = productPropertyService.findById(vo.getPropertyId());
+    if (ObjectUtil.isNull(property)) {
+      throw new DefaultClientException("属性不存在！");
     }
 
-    @Override
-    public List<ProductPropertyItem> query(QueryProductPropertyItemVo vo) {
-
-        return getBaseMapper().query(vo);
+    Wrapper<ProductPropertyItem> checkWrapper = Wrappers.lambdaQuery(ProductPropertyItem.class)
+        .eq(ProductPropertyItem::getPropertyId, vo.getPropertyId())
+        .eq(ProductPropertyItem::getCode, vo.getCode())
+        .eq(ProductPropertyItem::getAvailable, Boolean.TRUE);
+    if (getBaseMapper().selectCount(checkWrapper) > 0) {
+      throw new DefaultClientException("编号重复，请重新输入！");
     }
 
-    @Override
-    public List<ProductPropertyItem> getByPropertyId(String propertyId) {
-
-        return getBaseMapper().getByPropertyId(propertyId);
+    Wrapper<ProductPropertyItem> checkNameWrapper = Wrappers.lambdaQuery(ProductPropertyItem.class)
+        .eq(ProductPropertyItem::getPropertyId, vo.getPropertyId())
+        .eq(ProductPropertyItem::getName, vo.getName())
+        .eq(ProductPropertyItem::getAvailable, Boolean.TRUE);
+    if (getBaseMapper().selectCount(checkNameWrapper) > 0) {
+      throw new DefaultClientException("名称重复，请重新输入！");
     }
 
-    @Cacheable(value = ProductPropertyItem.CACHE_NAME, key = "@cacheVariables.tenantId() + #id", unless = "#result == null")
-    @Override
-    public ProductPropertyItem findById(String id) {
+    ProductPropertyItem data = new ProductPropertyItem();
+    data.setId(IdUtil.getId());
+    data.setCode(vo.getCode());
+    data.setName(vo.getName());
+    data.setPropertyId(vo.getPropertyId());
+    data.setAvailable(Boolean.TRUE);
+    data.setDescription(
+        StringUtil.isBlank(vo.getDescription()) ? StringPool.EMPTY_STR : vo.getDescription());
 
-        return getBaseMapper().selectById(id);
+    getBaseMapper().insert(data);
+
+    OpLogUtil.setVariable("id", data.getId());
+    OpLogUtil.setVariable("code", vo.getCode());
+    OpLogUtil.setExtra(vo);
+
+    return data.getId();
+  }
+
+  @OpLog(type = BaseDataOpLogType.class, name = "修改商品属性值，ID：{}, 编号：{}", params = {"#id",
+      "#code"})
+  @Transactional(rollbackFor = Exception.class)
+  @Override
+  public void update(UpdateProductPropertyItemVo vo) {
+
+    ProductPropertyItem data = this.findById(vo.getId());
+    if (data == null) {
+      throw new DefaultClientException("属性值不存在！");
     }
 
-    @OpLog(type = BaseDataOpLogType.class, name = "新增商品属性值，ID：{}, 编号：{}", params = {"#id", "#code"})
-    @Transactional(rollbackFor = Exception.class)
-    @Override
-    public String create(CreateProductPropertyItemVo vo) {
-
-        ProductProperty property = productPropertyService.findById(vo.getPropertyId());
-        if (ObjectUtil.isNull(property)) {
-            throw new DefaultClientException("属性不存在！");
-        }
-
-        Wrapper<ProductPropertyItem> checkWrapper = Wrappers.lambdaQuery(ProductPropertyItem.class)
-                .eq(ProductPropertyItem::getPropertyId, vo.getPropertyId())
-                .eq(ProductPropertyItem::getCode, vo.getCode());
-        if (getBaseMapper().selectCount(checkWrapper) > 0) {
-            throw new DefaultClientException("编号重复，请重新输入！");
-        }
-
-        Wrapper<ProductPropertyItem> checkNameWrapper = Wrappers.lambdaQuery(ProductPropertyItem.class)
-                .eq(ProductPropertyItem::getPropertyId, vo.getPropertyId())
-                .eq(ProductPropertyItem::getName, vo.getName());
-        if (getBaseMapper().selectCount(checkNameWrapper) > 0) {
-            throw new DefaultClientException("名称重复，请重新输入！");
-        }
-
-        ProductPropertyItem data = new ProductPropertyItem();
-        data.setId(IdUtil.getId());
-        data.setCode(vo.getCode());
-        data.setName(vo.getName());
-        data.setPropertyId(vo.getPropertyId());
-        data.setAvailable(Boolean.TRUE);
-        data.setDescription(StringUtil.isBlank(vo.getDescription()) ? StringPool.EMPTY_STR : vo.getDescription());
-
-        getBaseMapper().insert(data);
-
-        OpLogUtil.setVariable("id", data.getId());
-        OpLogUtil.setVariable("code", vo.getCode());
-        OpLogUtil.setExtra(vo);
-
-        return data.getId();
+    Wrapper<ProductPropertyItem> checkWrapper = Wrappers.lambdaQuery(ProductPropertyItem.class)
+        .eq(ProductPropertyItem::getPropertyId, data.getPropertyId())
+        .eq(ProductPropertyItem::getCode, vo.getCode())
+        .eq(ProductPropertyItem::getAvailable, Boolean.TRUE)
+        .ne(ProductPropertyItem::getId, vo.getId());
+    if (getBaseMapper().selectCount(checkWrapper) > 0) {
+      throw new DefaultClientException("编号重复，请重新输入！");
     }
 
-    @OpLog(type = BaseDataOpLogType.class, name = "修改商品属性值，ID：{}, 编号：{}", params = {"#id", "#code"})
-    @Transactional(rollbackFor = Exception.class)
-    @Override
-    public void update(UpdateProductPropertyItemVo vo) {
-
-        ProductPropertyItem data = this.findById(vo.getId());
-        if (data == null) {
-            throw new DefaultClientException("属性值不存在！");
-        }
-
-        Wrapper<ProductPropertyItem> checkWrapper = Wrappers.lambdaQuery(ProductPropertyItem.class)
-                .eq(ProductPropertyItem::getPropertyId, data.getPropertyId())
-                .eq(ProductPropertyItem::getCode, vo.getCode()).ne(ProductPropertyItem::getId, vo.getId());
-        if (getBaseMapper().selectCount(checkWrapper) > 0) {
-            throw new DefaultClientException("编号重复，请重新输入！");
-        }
-
-        Wrapper<ProductPropertyItem> checkNameWrapper = Wrappers.lambdaQuery(ProductPropertyItem.class)
-                .eq(ProductPropertyItem::getPropertyId, data.getPropertyId())
-                .eq(ProductPropertyItem::getName, vo.getName()).ne(ProductPropertyItem::getId, vo.getId());
-        if (getBaseMapper().selectCount(checkNameWrapper) > 0) {
-            throw new DefaultClientException("名称重复，请重新输入！");
-        }
-
-        Wrapper<ProductPropertyItem> updateWrapper = Wrappers.lambdaUpdate(ProductPropertyItem.class)
-                .set(ProductPropertyItem::getCode, vo.getCode()).set(ProductPropertyItem::getName, vo.getName())
-                .set(ProductPropertyItem::getAvailable, vo.getAvailable()).eq(ProductPropertyItem::getId, vo.getId())
-                .set(ProductPropertyItem::getDescription,
-                        StringUtil.isBlank(vo.getDescription()) ? StringPool.EMPTY_STR : vo.getDescription());
-        getBaseMapper().update(updateWrapper);
-
-        OpLogUtil.setVariable("id", data.getId());
-        OpLogUtil.setVariable("code", vo.getCode());
-        OpLogUtil.setExtra(vo);
+    Wrapper<ProductPropertyItem> checkNameWrapper = Wrappers.lambdaQuery(ProductPropertyItem.class)
+        .eq(ProductPropertyItem::getPropertyId, data.getPropertyId())
+        .eq(ProductPropertyItem::getName, vo.getName())
+        .eq(ProductPropertyItem::getAvailable, Boolean.TRUE)
+        .ne(ProductPropertyItem::getId, vo.getId());
+    if (getBaseMapper().selectCount(checkNameWrapper) > 0) {
+      throw new DefaultClientException("名称重复，请重新输入！");
     }
 
-    @CacheEvict(value = ProductPropertyItem.CACHE_NAME, key = "@cacheVariables.tenantId() + #key")
-    @Override
-    public void cleanCacheByKey(Serializable key) {
+    Wrapper<ProductPropertyItem> updateWrapper = Wrappers.lambdaUpdate(ProductPropertyItem.class)
+        .set(ProductPropertyItem::getCode, vo.getCode())
+        .set(ProductPropertyItem::getName, vo.getName())
+        .eq(ProductPropertyItem::getId, vo.getId())
+        .set(ProductPropertyItem::getDescription,
+            StringUtil.isBlank(vo.getDescription()) ? StringPool.EMPTY_STR : vo.getDescription());
+    getBaseMapper().update(updateWrapper);
 
-    }
+    OpLogUtil.setVariable("id", data.getId());
+    OpLogUtil.setVariable("code", vo.getCode());
+    OpLogUtil.setExtra(vo);
+  }
+
+  @Transactional(rollbackFor = Exception.class)
+  @OpLog(type = BaseDataOpLogType.class, name = "删除商品属性值，ID：{}", params = "#id")
+  @Override
+  public void deleteById(String id) {
+
+    Wrapper<ProductPropertyItem> deleteWrapper = Wrappers.lambdaUpdate(ProductPropertyItem.class)
+        .eq(ProductPropertyItem::getId, id).set(ProductPropertyItem::getAvailable, Boolean.FALSE);
+    this.update(deleteWrapper);
+
+    ProductPropertyItem propertyItem = this.findById(id);
+
+    DataChangeEventBuilder.publishLogicDelete(this, DeleteProductPropertyItemEvent.class,
+        propertyItem);
+  }
+
+  @CacheEvict(value = ProductPropertyItem.CACHE_NAME, key = "@cacheVariables.tenantId() + #key")
+  @Override
+  public void cleanCacheByKey(Serializable key) {
+
+  }
 }

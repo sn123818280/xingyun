@@ -9,23 +9,25 @@ import com.lframework.starter.common.exceptions.impl.DefaultClientException;
 import com.lframework.starter.common.utils.Assert;
 import com.lframework.starter.common.utils.ObjectUtil;
 import com.lframework.starter.common.utils.StringUtil;
-import com.lframework.starter.web.core.impl.BaseMpServiceImpl;
+import com.lframework.starter.web.core.annotations.oplog.OpLog;
 import com.lframework.starter.web.core.components.resp.PageResult;
+import com.lframework.starter.web.core.event.DataChangeEventBuilder;
+import com.lframework.starter.web.core.impl.BaseMpServiceImpl;
 import com.lframework.starter.web.core.utils.IdUtil;
+import com.lframework.starter.web.core.utils.OpLogUtil;
 import com.lframework.starter.web.core.utils.PageHelperUtil;
 import com.lframework.starter.web.core.utils.PageResultUtil;
+import com.lframework.starter.web.inner.dto.dic.city.DicCityDto;
+import com.lframework.starter.web.inner.service.DicCityService;
 import com.lframework.xingyun.basedata.entity.LogisticsCompany;
 import com.lframework.xingyun.basedata.enums.BaseDataOpLogType;
+import com.lframework.xingyun.basedata.events.DeleteLogisticsCompanyEvent;
 import com.lframework.xingyun.basedata.mappers.LogisticsCompanyMapper;
 import com.lframework.xingyun.basedata.service.logistics.LogisticsCompanyService;
 import com.lframework.xingyun.basedata.vo.logistics.company.CreateLogisticsCompanyVo;
 import com.lframework.xingyun.basedata.vo.logistics.company.QueryLogisticsCompanySelectorVo;
 import com.lframework.xingyun.basedata.vo.logistics.company.QueryLogisticsCompanyVo;
 import com.lframework.xingyun.basedata.vo.logistics.company.UpdateLogisticsCompanyVo;
-import com.lframework.starter.web.core.annotations.oplog.OpLog;
-import com.lframework.starter.web.inner.dto.dic.city.DicCityDto;
-import com.lframework.starter.web.inner.service.DicCityService;
-import com.lframework.starter.web.core.utils.OpLogUtil;
 import java.io.Serializable;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,24 +70,18 @@ public class LogisticsCompanyServiceImpl extends
     return getBaseMapper().selectById(id);
   }
 
-  @OpLog(type = BaseDataOpLogType.class, name = "停用物流公司，ID：{}", params = "#id")
+  @OpLog(type = BaseDataOpLogType.class, name = "删除物流公司，ID：{}", params = "#id")
   @Transactional(rollbackFor = Exception.class)
   @Override
-  public void unable(String id) {
+  public void deleteById(String id) {
 
     Wrapper<LogisticsCompany> updateWrapper = Wrappers.lambdaUpdate(LogisticsCompany.class)
         .set(LogisticsCompany::getAvailable, Boolean.FALSE).eq(LogisticsCompany::getId, id);
     getBaseMapper().update(updateWrapper);
-  }
 
-  @OpLog(type = BaseDataOpLogType.class, name = "启用物流公司，ID：{}", params = "#id")
-  @Transactional(rollbackFor = Exception.class)
-  @Override
-  public void enable(String id) {
+    LogisticsCompany record = this.findById(id);
 
-    Wrapper<LogisticsCompany> updateWrapper = Wrappers.lambdaUpdate(LogisticsCompany.class)
-        .set(LogisticsCompany::getAvailable, Boolean.TRUE).eq(LogisticsCompany::getId, id);
-    getBaseMapper().update(updateWrapper);
+    DataChangeEventBuilder.publishLogicDelete(this, DeleteLogisticsCompanyEvent.class, record);
   }
 
   @OpLog(type = BaseDataOpLogType.class, name = "新增物流公司，ID：{}, 编号：{}", params = {"#id",
@@ -95,7 +91,7 @@ public class LogisticsCompanyServiceImpl extends
   public String create(CreateLogisticsCompanyVo vo) {
 
     Wrapper<LogisticsCompany> checkWrapper = Wrappers.lambdaQuery(LogisticsCompany.class)
-        .eq(LogisticsCompany::getCode, vo.getCode());
+        .eq(LogisticsCompany::getCode, vo.getCode()).eq(LogisticsCompany::getAvailable, true);
     if (getBaseMapper().selectCount(checkWrapper) > 0) {
       throw new DefaultClientException("编号重复，请重新输入！");
     }
@@ -145,6 +141,7 @@ public class LogisticsCompanyServiceImpl extends
 
     Wrapper<LogisticsCompany> checkWrapper = Wrappers.lambdaQuery(LogisticsCompany.class)
         .eq(LogisticsCompany::getCode, vo.getCode())
+        .eq(LogisticsCompany::getAvailable, true)
         .ne(LogisticsCompany::getId, vo.getId());
     if (getBaseMapper().selectCount(checkWrapper) > 0) {
       throw new DefaultClientException("编号重复，请重新输入！");
@@ -159,7 +156,6 @@ public class LogisticsCompanyServiceImpl extends
             !StringUtil.isBlank(vo.getTelephone()) ? vo.getTelephone() : null)
         .set(LogisticsCompany::getAddress,
             !StringUtil.isBlank(vo.getAddress()) ? vo.getAddress() : null)
-        .set(LogisticsCompany::getAvailable, vo.getAvailable())
         .set(LogisticsCompany::getDescription,
             StringUtil.isBlank(vo.getDescription()) ? StringPool.EMPTY_STR : vo.getDescription())
         .eq(LogisticsCompany::getId, vo.getId());

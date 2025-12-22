@@ -36,13 +36,6 @@ public class UpdateProductCategoryVo implements BaseVo, Serializable {
   private String name;
 
   /**
-   * 状态
-   */
-  @ApiModelProperty(value = "状态", required = true)
-  @NotNull(message = "请选择状态！")
-  private Boolean available;
-
-  /**
    * 备注
    */
   @ApiModelProperty("备注")

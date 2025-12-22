@@ -26,12 +26,6 @@ public class MemberSelectorBo extends BaseBo<Member> {
     @ApiModelProperty("名称")
     private String name;
 
-    /**
-     * 状态
-     */
-    @ApiModelProperty("状态")
-    private Boolean available;
-
     public MemberSelectorBo(Member dto) {
 
         super(dto);

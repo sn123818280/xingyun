@@ -30,12 +30,6 @@ public class QueryMemberBo extends BaseBo<Member> {
     private String name;
 
     /**
-     * 状态
-     */
-    @ApiModelProperty("状态")
-    private Boolean available;
-
-    /**
      * 备注
      */
     @ApiModelProperty("备注")

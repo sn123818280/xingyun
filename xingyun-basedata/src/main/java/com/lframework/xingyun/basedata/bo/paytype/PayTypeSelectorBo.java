@@ -32,12 +32,6 @@ public class PayTypeSelectorBo extends BaseBo<PayType> {
   @ApiModelProperty("是否记录内容")
   private Boolean recText;
 
-  /**
-   * 状态
-   */
-  @ApiModelProperty("状态")
-  private Boolean available;
-
   public PayTypeSelectorBo() {
 
   }

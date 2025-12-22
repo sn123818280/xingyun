@@ -28,8 +28,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -104,31 +104,15 @@ public class SettleOutItemController extends DefaultBaseController {
   }
 
   /**
-   * 停用支出项目
+   * 根据ID删除
    */
-  @ApiOperation("停用支出项目")
-  @HasPermission({"settle:out-item:modify"})
-  @PatchMapping("/unable")
-  public InvokeResult<Void> unable(
+  @ApiOperation("根据ID删除")
+  @HasPermission({"settle:out-item:delete"})
+  @DeleteMapping
+  public InvokeResult<Void> deleteById(
       @ApiParam(value = "ID", required = true) @NotEmpty(message = "支出项目ID不能为空！") String id) {
 
-    settleOutItemService.unable(id);
-
-    settleOutItemService.cleanCacheByKey(id);
-
-    return InvokeResultBuilder.success();
-  }
-
-  /**
-   * 启用支出项目
-   */
-  @ApiOperation("启用支出项目")
-  @HasPermission({"settle:out-item:modify"})
-  @PatchMapping("/enable")
-  public InvokeResult<Void> enable(
-      @ApiParam(value = "ID", required = true) @NotEmpty(message = "支出项目ID不能为空！") String id) {
-
-    settleOutItemService.enable(id);
+    settleOutItemService.deleteById(id);
 
     settleOutItemService.cleanCacheByKey(id);
 

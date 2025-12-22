@@ -36,9 +36,6 @@
                 <if test="vo.productType != null">
                     AND g.product_type = #{vo.productType}
                 </if>
-                <if test="vo.available != null">
-                    AND g.available = #{vo.available}
-                </if>
                 <if test="vo.startTime != null">
                     AND g.create_time >= #{vo.startTime}
                 </if>
@@ -48,6 +45,7 @@
                 ]]>
                 </if>
             </if>
+            AND g.available = TRUE
         </where>
         ORDER BY g.code
     </select>
@@ -62,6 +60,7 @@
         <if test="productType != null">
             AND g.product_type = #{productType}
         </if>
+        AND g.available = TRUE
         ORDER BY g.code
     </select>
     <select id="getByBrandIds" resultType="com.lframework.xingyun.basedata.entity.Product">
@@ -70,6 +69,7 @@
         <if test="productType != null">
             AND g.product_type = #{productType}
         </if>
+        AND g.available = TRUE
         ORDER BY g.code
     </select>
     <select id="queryCount" resultType="java.lang.Integer">
@@ -96,9 +96,6 @@
                 <if test="vo.productType != null">
                     AND g.product_type = #{vo.productType}
                 </if>
-                <if test="vo.available != null">
-                    AND g.available = #{vo.available}
-                </if>
                 <if test="vo.startTime != null">
                     AND g.create_time >= #{vo.startTime}
                 </if>
@@ -108,6 +105,7 @@
                 ]]>
                 </if>
             </if>
+            AND g.available = TRUE
         </where>
         ORDER BY g.code
     </select>
@@ -115,12 +113,13 @@
         SELECT p.id
         FROM base_data_product AS p
         LEFT JOIN base_data_product_property_relation AS pr ON p.id = pr.product_id AND pr.property_id = #{propertyId}
-        WHERE pr.product_id IS NULL
+        WHERE p.available = TRUE AND pr.product_id IS NULL
     </select>
     <select id="getIdByCategoryId" resultType="java.lang.String">
         SELECT id
         FROM base_data_product AS p
         WHERE p.category_id = #{categoryId}
+          AND p.available = TRUE
     </select>
 
     <select id="selector" resultType="com.lframework.xingyun.basedata.entity.Product">
@@ -148,9 +147,6 @@
               <if test="vo.productType != null">
                   AND g.product_type = #{vo.productType}
               </if>
-              <if test="vo.available != null">
-                  AND g.available = #{vo.available}
-              </if>
               <if test="vo.startTime != null">
                   AND g.create_time >= #{vo.startTime}
               </if>
@@ -160,6 +156,7 @@
                   ]]>
               </if>
           </if>
+          AND g.available = TRUE
         </where>
         ORDER BY g.code
     </select>

@@ -30,8 +30,8 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -97,31 +97,15 @@ public class ProductBrandController extends DefaultBaseController {
   }
 
   /**
-   * 停用品牌
+   * 根据ID删除
    */
-  @ApiOperation("停用品牌")
-  @HasPermission({"base-data:product:brand:modify"})
-  @PatchMapping("/unable")
-  public InvokeResult<Void> unable(
+  @ApiOperation("根据ID删除")
+  @HasPermission({"base-data:product:brand:delete"})
+  @DeleteMapping
+  public InvokeResult<Void> deleteById(
       @ApiParam(value = "ID", required = true) @NotEmpty(message = "品牌ID不能为空！") String id) {
 
-    productBrandService.unable(id);
-
-    productBrandService.cleanCacheByKey(id);
-
-    return InvokeResultBuilder.success();
-  }
-
-  /**
-   * 启用品牌
-   */
-  @ApiOperation("启用品牌")
-  @HasPermission({"base-data:product:brand:modify"})
-  @PatchMapping("/enable")
-  public InvokeResult<Void> enable(
-      @ApiParam(value = "ID", required = true) @NotEmpty(message = "品牌ID不能为空！") String id) {
-
-    productBrandService.enable(id);
+    productBrandService.deleteById(id);
 
     productBrandService.cleanCacheByKey(id);
 

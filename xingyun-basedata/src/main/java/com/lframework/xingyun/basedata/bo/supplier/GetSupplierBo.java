@@ -136,12 +136,6 @@ public class GetSupplierBo extends BaseBo<Supplier> {
     private String accountNo;
 
     /**
-     * 状态
-     */
-    @ApiModelProperty("状态")
-    private Boolean available;
-
-    /**
      * 备注
      */
     @ApiModelProperty("备注")

@@ -30,12 +30,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -95,31 +90,15 @@ public class StoreCenterController extends DefaultBaseController {
   }
 
   /**
-   * 停用仓库
+   * 删除仓库
    */
-  @ApiOperation("停用仓库")
-  @HasPermission({"base-data:store-center:modify"})
-  @PatchMapping("/unable")
-  public InvokeResult<Void> unable(
+  @ApiOperation("删除仓库")
+  @HasPermission({"base-data:store-center:delete"})
+  @DeleteMapping
+  public InvokeResult<Void> deleteById(
       @ApiParam(value = "ID", required = true) @NotEmpty(message = "仓库ID不能为空！") String id) {
 
-    storeCenterService.unable(id);
-
-    storeCenterService.cleanCacheByKey(id);
-
-    return InvokeResultBuilder.success();
-  }
-
-  /**
-   * 启用仓库
-   */
-  @ApiOperation("启用仓库")
-  @HasPermission({"base-data:store-center:modify"})
-  @PatchMapping("/enable")
-  public InvokeResult<Void> enable(
-      @ApiParam(value = "ID", required = true) @NotEmpty(message = "仓库ID不能为空！") String id) {
-
-    storeCenterService.enable(id);
+    storeCenterService.deleteById(id);
 
     storeCenterService.cleanCacheByKey(id);
 

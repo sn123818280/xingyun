@@ -8,8 +8,8 @@ import com.lframework.starter.common.constants.StringPool;
 import com.lframework.starter.common.exceptions.impl.DefaultClientException;
 import com.lframework.starter.common.utils.RegUtil;
 import com.lframework.starter.common.utils.StringUtil;
-import com.lframework.starter.web.core.utils.ApplicationUtil;
 import com.lframework.starter.web.core.components.excel.ExcelImportListener;
+import com.lframework.starter.web.core.utils.ApplicationUtil;
 import com.lframework.starter.web.core.utils.IdUtil;
 import com.lframework.xingyun.basedata.entity.ProductCategory;
 import com.lframework.xingyun.basedata.service.product.ProductCategoryService;
@@ -35,11 +35,13 @@ public class ProductCategoryImportListener extends ExcelImportListener<ProductCa
     }
     if (checkList.contains(data.getCode())) {
       throw new DefaultClientException(
-          "第" + context.readRowHolder().getRowIndex() + "行“编号”与第" + (checkList.indexOf(data.getCode()) + 1) + "行重复");
+          "第" + context.readRowHolder().getRowIndex() + "行“编号”与第" + (
+              checkList.indexOf(data.getCode()) + 1) + "行重复");
     }
     checkList.add(data.getCode());
     Wrapper<ProductCategory> checkWrapper = Wrappers.lambdaQuery(ProductCategory.class)
-        .eq(ProductCategory::getCode, data.getCode());
+        .eq(ProductCategory::getCode, data.getCode())
+        .eq(ProductCategory::getAvailable, Boolean.TRUE);
     ProductCategoryService productCategoryService = ApplicationUtil.getBean(
         ProductCategoryService.class);
     if (productCategoryService.count(checkWrapper) > 0) {
@@ -52,7 +54,8 @@ public class ProductCategoryImportListener extends ExcelImportListener<ProductCa
     }
     if (!StringUtil.isBlank(data.getParentCode())) {
       Wrapper<ProductCategory> queryParentWrapper = Wrappers.lambdaQuery(ProductCategory.class)
-          .eq(ProductCategory::getCode, data.getParentCode());
+          .eq(ProductCategory::getCode, data.getParentCode())
+          .eq(ProductCategory::getAvailable, Boolean.TRUE);
       ProductCategory parent = productCategoryService.getOne(queryParentWrapper);
       if (parent == null) {
         // 检查是不是新导入的
@@ -64,7 +67,8 @@ public class ProductCategoryImportListener extends ExcelImportListener<ProductCa
 
       // 不允许改变上级分类
       Wrapper<ProductCategory> queryWrapper = Wrappers.lambdaQuery(ProductCategory.class)
-          .eq(ProductCategory::getCode, data.getCode());
+          .eq(ProductCategory::getCode, data.getCode())
+          .eq(ProductCategory::getAvailable, Boolean.TRUE);
       ProductCategory productCategory = productCategoryService.getOne(queryWrapper);
       if (productCategory != null) {
         ProductCategory parentCategory = StringUtil.isBlank(productCategory.getParentId()) ? null
@@ -103,7 +107,8 @@ public class ProductCategoryImportListener extends ExcelImportListener<ProductCa
       record.setName(data.getName());
       if (!StringUtil.isBlank(data.getParentCode())) {
         Wrapper<ProductCategory> queryParentWrapper = Wrappers.lambdaQuery(ProductCategory.class)
-            .eq(ProductCategory::getCode, data.getParentCode());
+            .eq(ProductCategory::getCode, data.getParentCode())
+            .eq(ProductCategory::getAvailable, Boolean.TRUE);
         ProductCategory parent = productCategoryService.getOne(queryParentWrapper);
         if (parent == null) {
           throw new DefaultClientException("第" + (i + 1) + "行“上级分类编号”不存在");
@@ -117,16 +122,10 @@ public class ProductCategoryImportListener extends ExcelImportListener<ProductCa
       record.setDescription(
           StringUtil.isBlank(data.getDescription()) ? StringPool.EMPTY_STR : data.getDescription());
 
-      //这里要与上级分类的状态保持一致
-      Boolean available = Boolean.TRUE;
-      if (StringUtil.isNotBlank(record.getParentId())) {
-        ProductCategory parentCategory = productCategoryService.findById(record.getParentId());
-        available = parentCategory.getAvailable();
-      }
-      record.setAvailable(available);
+      record.setAvailable(Boolean.TRUE);
 
       productCategoryService.save(record);
-      productCategoryService.saveRecursion(record.getId(), record.getParentId());
+      productCategoryService.saveRecursion(true, record.getId(), record.getParentId());
       data.setId(record.getId());
 
       this.setSuccessProcess(i);

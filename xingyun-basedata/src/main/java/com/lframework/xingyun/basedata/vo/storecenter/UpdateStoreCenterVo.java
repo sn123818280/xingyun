@@ -5,7 +5,6 @@ import com.lframework.starter.web.core.vo.BaseVo;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -64,13 +63,6 @@ public class UpdateStoreCenterVo implements BaseVo, Serializable {
    */
   @ApiModelProperty("仓库人数")
   private Integer peopleNum;
-
-  /**
-   * 状态
-   */
-  @ApiModelProperty(value = "状态", required = true)
-  @NotNull(message = "状态不能为空！")
-  private Boolean available;
 
   /**
    * 备注

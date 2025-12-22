@@ -11,12 +11,16 @@ import com.lframework.starter.common.utils.Assert;
 import com.lframework.starter.common.utils.CollectionUtil;
 import com.lframework.starter.common.utils.ObjectUtil;
 import com.lframework.starter.common.utils.StringUtil;
-import com.lframework.starter.web.core.impl.BaseMpServiceImpl;
+import com.lframework.starter.web.core.annotations.oplog.OpLog;
 import com.lframework.starter.web.core.components.resp.PageResult;
+import com.lframework.starter.web.core.event.DataChangeEventBuilder;
+import com.lframework.starter.web.core.impl.BaseMpServiceImpl;
 import com.lframework.starter.web.core.utils.EnumUtil;
 import com.lframework.starter.web.core.utils.IdUtil;
+import com.lframework.starter.web.core.utils.OpLogUtil;
 import com.lframework.starter.web.core.utils.PageHelperUtil;
 import com.lframework.starter.web.core.utils.PageResultUtil;
+import com.lframework.starter.web.inner.service.RecursionMappingService;
 import com.lframework.xingyun.basedata.dto.product.property.ProductPropertyModelorDto;
 import com.lframework.xingyun.basedata.entity.ProductCategory;
 import com.lframework.xingyun.basedata.entity.ProductCategoryProperty;
@@ -26,6 +30,7 @@ import com.lframework.xingyun.basedata.enums.ColumnDataType;
 import com.lframework.xingyun.basedata.enums.ColumnType;
 import com.lframework.xingyun.basedata.enums.ProductCategoryNodeType;
 import com.lframework.xingyun.basedata.enums.PropertyType;
+import com.lframework.xingyun.basedata.events.DeleteProductPropertyEvent;
 import com.lframework.xingyun.basedata.mappers.ProductPropertyMapper;
 import com.lframework.xingyun.basedata.service.product.ProductCategoryPropertyService;
 import com.lframework.xingyun.basedata.service.product.ProductCategoryService;
@@ -34,9 +39,6 @@ import com.lframework.xingyun.basedata.service.product.ProductPropertyService;
 import com.lframework.xingyun.basedata.vo.product.property.CreateProductPropertyVo;
 import com.lframework.xingyun.basedata.vo.product.property.QueryProductPropertyVo;
 import com.lframework.xingyun.basedata.vo.product.property.UpdateProductPropertyVo;
-import com.lframework.starter.web.core.annotations.oplog.OpLog;
-import com.lframework.starter.web.inner.service.RecursionMappingService;
-import com.lframework.starter.web.core.utils.OpLogUtil;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -92,24 +94,19 @@ public class ProductPropertyServiceImpl extends
     return getBaseMapper().selectById(id);
   }
 
-  @OpLog(type = BaseDataOpLogType.class, name = "停用商品属性，ID：{}", params = "#id")
+  @OpLog(type = BaseDataOpLogType.class, name = "删除商品属性，ID：{}", params = "#id")
   @Transactional(rollbackFor = Exception.class)
   @Override
-  public void unable(String id) {
+  public void deleteById(String id) {
 
     Wrapper<ProductProperty> updateWrapper = Wrappers.lambdaUpdate(ProductProperty.class)
         .set(ProductProperty::getAvailable, Boolean.FALSE).eq(ProductProperty::getId, id);
     getBaseMapper().update(updateWrapper);
-  }
 
-  @OpLog(type = BaseDataOpLogType.class, name = "启用商品属性，ID：{}", params = "#id")
-  @Transactional(rollbackFor = Exception.class)
-  @Override
-  public void enable(String id) {
+    ProductProperty productProperty = this.findById(id);
 
-    Wrapper<ProductProperty> updateWrapper = Wrappers.lambdaUpdate(ProductProperty.class)
-        .set(ProductProperty::getAvailable, Boolean.TRUE).eq(ProductProperty::getId, id);
-    getBaseMapper().update(updateWrapper);
+    DataChangeEventBuilder.publishLogicDelete(this, DeleteProductPropertyEvent.class,
+        productProperty);
   }
 
   private List<String> calcCategoryIds(List<String> categoryIds) {
@@ -144,13 +141,13 @@ public class ProductPropertyServiceImpl extends
   public String create(CreateProductPropertyVo vo) {
 
     Wrapper<ProductProperty> checkCodeWrapper = Wrappers.lambdaQuery(ProductProperty.class)
-        .eq(ProductProperty::getCode, vo.getCode());
+        .eq(ProductProperty::getCode, vo.getCode()).eq(ProductProperty::getAvailable, Boolean.TRUE);
     if (getBaseMapper().selectCount(checkCodeWrapper) > 0) {
       throw new DefaultClientException("编号重复，请重新输入！");
     }
 
     Wrapper<ProductProperty> checkNameWrapper = Wrappers.lambdaQuery(ProductProperty.class)
-        .eq(ProductProperty::getName, vo.getName());
+        .eq(ProductProperty::getName, vo.getName()).eq(ProductProperty::getAvailable, Boolean.TRUE);
     if (getBaseMapper().selectCount(checkNameWrapper) > 0) {
       throw new DefaultClientException("名称重复，请重新输入！");
     }
@@ -216,13 +213,15 @@ public class ProductPropertyServiceImpl extends
     }
 
     Wrapper<ProductProperty> checkWrapper = Wrappers.lambdaQuery(ProductProperty.class)
-        .eq(ProductProperty::getCode, vo.getCode()).ne(ProductProperty::getId, vo.getId());
+        .eq(ProductProperty::getCode, vo.getCode()).eq(ProductProperty::getAvailable, Boolean.TRUE)
+        .ne(ProductProperty::getId, vo.getId());
     if (getBaseMapper().selectCount(checkWrapper) > 0) {
       throw new DefaultClientException("编号重复，请重新输入！");
     }
 
     Wrapper<ProductProperty> checkNameWrapper = Wrappers.lambdaQuery(ProductProperty.class)
-        .eq(ProductProperty::getName, vo.getName()).ne(ProductProperty::getId, vo.getId());
+        .eq(ProductProperty::getName, vo.getName()).eq(ProductProperty::getAvailable, Boolean.TRUE)
+        .ne(ProductProperty::getId, vo.getId());
     if (getBaseMapper().selectCount(checkNameWrapper) > 0) {
       throw new DefaultClientException("名称重复，请重新输入！");
     }
@@ -292,7 +291,7 @@ public class ProductPropertyServiceImpl extends
         .set(ProductProperty::getIsRequired, vo.getIsRequired())
         .set(ProductProperty::getColumnType, vo.getColumnType())
         .set(ProductProperty::getPropertyType, vo.getPropertyType())
-        .set(ProductProperty::getAvailable, vo.getAvailable()).set(ProductProperty::getDescription,
+        .set(ProductProperty::getDescription,
             StringUtil.isBlank(vo.getDescription()) ? StringPool.EMPTY_STR : vo.getDescription())
         .eq(ProductProperty::getId, vo.getId());
     if (vo.getColumnType() != ColumnType.CUSTOM.getCode().intValue()) {

@@ -13,9 +13,9 @@ import com.lframework.starter.web.core.annotations.oplog.OpLog;
 import com.lframework.starter.web.core.components.resp.PageResult;
 import com.lframework.starter.web.core.impl.BaseMpServiceImpl;
 import com.lframework.starter.web.core.utils.IdUtil;
+import com.lframework.starter.web.core.utils.OpLogUtil;
 import com.lframework.starter.web.core.utils.PageHelperUtil;
 import com.lframework.starter.web.core.utils.PageResultUtil;
-import com.lframework.starter.web.core.utils.OpLogUtil;
 import com.lframework.xingyun.sc.entity.StockAdjustReason;
 import com.lframework.xingyun.sc.enums.StockAdjustOpLogType;
 import com.lframework.xingyun.sc.mappers.StockAdjustReasonMapper;
@@ -75,34 +75,26 @@ public class StockAdjustReasonServiceImpl extends
     return getBaseMapper().selectById(id);
   }
 
-  @OpLog(type = StockAdjustOpLogType.class, name = "停用库存调整原因，ID：{}", params = "#id")
+  @OpLog(type = StockAdjustOpLogType.class, name = "删除库存调整原因，ID：{}", params = "#id")
   @Transactional(rollbackFor = Exception.class)
   @Override
-  public void unable(String id) {
+  public void deleteById(String id) {
 
     Wrapper<StockAdjustReason> updateWrapper = Wrappers.lambdaUpdate(StockAdjustReason.class)
         .set(StockAdjustReason::getAvailable, Boolean.FALSE).eq(StockAdjustReason::getId, id);
     getBaseMapper().update(updateWrapper);
   }
 
-  @OpLog(type = StockAdjustOpLogType.class, name = "启用库存调整原因，ID：{}", params = "#id")
-  @Transactional(rollbackFor = Exception.class)
-  @Override
-  public void enable(String id) {
-
-    Wrapper<StockAdjustReason> updateWrapper = Wrappers.lambdaUpdate(StockAdjustReason.class)
-        .set(StockAdjustReason::getAvailable, Boolean.TRUE).eq(StockAdjustReason::getId, id);
-    getBaseMapper().update(updateWrapper);
-  }
-
-  @OpLog(type = StockAdjustOpLogType.class, name = "新增库存调整原因，ID：{}, 编号：{}", params = {"#id",
+  @OpLog(type = StockAdjustOpLogType.class, name = "新增库存调整原因，ID：{}, 编号：{}", params = {
+      "#id",
       "#code"})
   @Transactional(rollbackFor = Exception.class)
   @Override
   public String create(CreateStockAdjustReasonVo vo) {
 
     Wrapper<StockAdjustReason> checkWrapper = Wrappers.lambdaQuery(StockAdjustReason.class)
-        .eq(StockAdjustReason::getCode, vo.getCode());
+        .eq(StockAdjustReason::getCode, vo.getCode())
+        .eq(StockAdjustReason::getAvailable, Boolean.TRUE);
     if (getBaseMapper().selectCount(checkWrapper) > 0) {
       throw new DefaultClientException("编号重复，请重新输入！");
     }
@@ -124,7 +116,8 @@ public class StockAdjustReasonServiceImpl extends
     return data.getId();
   }
 
-  @OpLog(type = StockAdjustOpLogType.class, name = "修改库存调整原因，ID：{}, 编号：{}", params = {"#id",
+  @OpLog(type = StockAdjustOpLogType.class, name = "修改库存调整原因，ID：{}, 编号：{}", params = {
+      "#id",
       "#code"})
   @Transactional(rollbackFor = Exception.class)
   @Override
@@ -136,7 +129,8 @@ public class StockAdjustReasonServiceImpl extends
     }
 
     Wrapper<StockAdjustReason> checkWrapper = Wrappers.lambdaQuery(StockAdjustReason.class)
-        .eq(StockAdjustReason::getCode, vo.getCode()).ne(StockAdjustReason::getId, vo.getId());
+        .eq(StockAdjustReason::getCode, vo.getCode())
+        .eq(StockAdjustReason::getAvailable, Boolean.TRUE).ne(StockAdjustReason::getId, vo.getId());
     if (getBaseMapper().selectCount(checkWrapper) > 0) {
       throw new DefaultClientException("编号重复，请重新输入！");
     }
@@ -144,7 +138,6 @@ public class StockAdjustReasonServiceImpl extends
     LambdaUpdateWrapper<StockAdjustReason> updateWrapper = Wrappers.lambdaUpdate(
             StockAdjustReason.class)
         .set(StockAdjustReason::getCode, vo.getCode()).set(StockAdjustReason::getName, vo.getName())
-        .set(StockAdjustReason::getAvailable, vo.getAvailable())
         .set(StockAdjustReason::getDescription,
             StringUtil.isBlank(vo.getDescription()) ? StringPool.EMPTY_STR : vo.getDescription())
         .eq(StockAdjustReason::getId, vo.getId());

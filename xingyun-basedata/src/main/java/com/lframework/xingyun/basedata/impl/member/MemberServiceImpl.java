@@ -9,23 +9,25 @@ import com.lframework.starter.common.exceptions.impl.DefaultClientException;
 import com.lframework.starter.common.utils.Assert;
 import com.lframework.starter.common.utils.ObjectUtil;
 import com.lframework.starter.common.utils.StringUtil;
-import com.lframework.starter.web.core.impl.BaseMpServiceImpl;
+import com.lframework.starter.web.core.annotations.oplog.OpLog;
 import com.lframework.starter.web.core.components.resp.PageResult;
+import com.lframework.starter.web.core.event.DataChangeEventBuilder;
+import com.lframework.starter.web.core.impl.BaseMpServiceImpl;
 import com.lframework.starter.web.core.utils.EnumUtil;
 import com.lframework.starter.web.core.utils.IdUtil;
+import com.lframework.starter.web.core.utils.OpLogUtil;
 import com.lframework.starter.web.core.utils.PageHelperUtil;
 import com.lframework.starter.web.core.utils.PageResultUtil;
+import com.lframework.starter.web.inner.enums.system.Gender;
 import com.lframework.xingyun.basedata.entity.Member;
 import com.lframework.xingyun.basedata.enums.BaseDataOpLogType;
+import com.lframework.xingyun.basedata.events.DeleteMemberEvent;
 import com.lframework.xingyun.basedata.mappers.MemberMapper;
 import com.lframework.xingyun.basedata.service.member.MemberService;
 import com.lframework.xingyun.basedata.vo.member.CreateMemberVo;
 import com.lframework.xingyun.basedata.vo.member.QueryMemberSelectorVo;
 import com.lframework.xingyun.basedata.vo.member.QueryMemberVo;
 import com.lframework.xingyun.basedata.vo.member.UpdateMemberVo;
-import com.lframework.starter.web.core.annotations.oplog.OpLog;
-import com.lframework.starter.web.inner.enums.system.Gender;
-import com.lframework.starter.web.core.utils.OpLogUtil;
 import java.io.Serializable;
 import java.util.List;
 import org.springframework.cache.annotation.CacheEvict;
@@ -62,26 +64,19 @@ public class MemberServiceImpl extends BaseMpServiceImpl<MemberMapper, Member> i
     return getBaseMapper().selectById(id);
   }
 
-  @OpLog(type = BaseDataOpLogType.class, name = "停用会员，ID：{}", params = "#id")
+  @OpLog(type = BaseDataOpLogType.class, name = "删除会员，ID：{}", params = "#id")
   @Transactional(rollbackFor = Exception.class)
   @Override
-  public void unable(String id) {
+  public void deleteById(String id) {
 
     Wrapper<Member> updateWrapper = Wrappers.lambdaUpdate(Member.class)
         .set(Member::getAvailable, Boolean.FALSE)
         .eq(Member::getId, id);
     getBaseMapper().update(updateWrapper);
-  }
 
-  @OpLog(type = BaseDataOpLogType.class, name = "启用会员，ID：{}", params = "#id")
-  @Transactional(rollbackFor = Exception.class)
-  @Override
-  public void enable(String id) {
+    Member record = this.findById(id);
 
-    Wrapper<Member> updateWrapper = Wrappers.lambdaUpdate(Member.class)
-        .set(Member::getAvailable, Boolean.TRUE)
-        .eq(Member::getId, id);
-    getBaseMapper().update(updateWrapper);
+    DataChangeEventBuilder.publishLogicDelete(this, DeleteMemberEvent.class, record);
   }
 
   @OpLog(type = BaseDataOpLogType.class, name = "新增会员，ID：{}, 编号：{}", params = {"#id",
@@ -91,14 +86,16 @@ public class MemberServiceImpl extends BaseMpServiceImpl<MemberMapper, Member> i
   public String create(CreateMemberVo vo) {
 
     Wrapper<Member> checkWrapper = Wrappers.lambdaQuery(Member.class)
-        .eq(Member::getCode, vo.getCode());
+        .eq(Member::getCode, vo.getCode())
+        .eq(Member::getAvailable, Boolean.TRUE);
     if (getBaseMapper().selectCount(checkWrapper) > 0) {
       throw new DefaultClientException("编号重复，请重新输入！");
     }
 
     if (!StringUtil.isBlank(vo.getTelephone())) {
       checkWrapper = Wrappers.lambdaQuery(Member.class)
-          .eq(Member::getTelephone, vo.getTelephone());
+          .eq(Member::getTelephone, vo.getTelephone())
+          .eq(Member::getAvailable, Boolean.TRUE);
       if (getBaseMapper().selectCount(checkWrapper) > 0) {
         throw new DefaultClientException("手机号重复，请重新输入！");
       }
@@ -153,6 +150,7 @@ public class MemberServiceImpl extends BaseMpServiceImpl<MemberMapper, Member> i
 
     Wrapper<Member> checkWrapper = Wrappers.lambdaQuery(Member.class)
         .eq(Member::getCode, vo.getCode())
+        .eq(Member::getAvailable, Boolean.TRUE)
         .ne(Member::getId, vo.getId());
     if (getBaseMapper().selectCount(checkWrapper) > 0) {
       throw new DefaultClientException("编号重复，请重新输入！");
@@ -161,6 +159,7 @@ public class MemberServiceImpl extends BaseMpServiceImpl<MemberMapper, Member> i
     if (!StringUtil.isBlank(vo.getTelephone())) {
       checkWrapper = Wrappers.lambdaQuery(Member.class)
           .eq(Member::getTelephone, vo.getTelephone())
+          .eq(Member::getAvailable, Boolean.TRUE)
           .ne(Member::getId, vo.getId());
       if (getBaseMapper().selectCount(checkWrapper) > 0) {
         throw new DefaultClientException("手机号重复，请重新输入！");
@@ -178,7 +177,7 @@ public class MemberServiceImpl extends BaseMpServiceImpl<MemberMapper, Member> i
         .set(Member::getShopId, !StringUtil.isBlank(vo.getShopId()) ? vo.getShopId() : null)
         .set(Member::getGuiderId,
             !StringUtil.isBlank(vo.getGuiderId()) ? vo.getGuiderId() : null)
-        .set(Member::getAvailable, vo.getAvailable()).set(Member::getDescription,
+        .set(Member::getDescription,
             StringUtil.isBlank(vo.getDescription()) ? StringPool.EMPTY_STR : vo.getDescription())
         .eq(Member::getId, vo.getId());
 

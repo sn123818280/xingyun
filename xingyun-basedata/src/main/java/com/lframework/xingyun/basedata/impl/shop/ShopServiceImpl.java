@@ -10,14 +10,16 @@ import com.lframework.starter.common.utils.Assert;
 import com.lframework.starter.common.utils.ObjectUtil;
 import com.lframework.starter.common.utils.StringUtil;
 import com.lframework.starter.web.core.annotations.oplog.OpLog;
-import com.lframework.xingyun.basedata.enums.BaseDataOpLogType;
-import com.lframework.starter.web.core.impl.BaseMpServiceImpl;
 import com.lframework.starter.web.core.components.resp.PageResult;
+import com.lframework.starter.web.core.event.DataChangeEventBuilder;
+import com.lframework.starter.web.core.impl.BaseMpServiceImpl;
+import com.lframework.starter.web.core.utils.IdUtil;
 import com.lframework.starter.web.core.utils.OpLogUtil;
 import com.lframework.starter.web.core.utils.PageHelperUtil;
 import com.lframework.starter.web.core.utils.PageResultUtil;
-import com.lframework.starter.web.core.utils.IdUtil;
 import com.lframework.xingyun.basedata.entity.Shop;
+import com.lframework.xingyun.basedata.enums.BaseDataOpLogType;
+import com.lframework.xingyun.basedata.events.DeleteShopEvent;
 import com.lframework.xingyun.basedata.mappers.ShopMapper;
 import com.lframework.xingyun.basedata.service.shop.ShopService;
 import com.lframework.xingyun.basedata.vo.shop.CreateShopVo;
@@ -58,12 +60,29 @@ public class ShopServiceImpl extends BaseMpServiceImpl<ShopMapper, Shop> impleme
     return getBaseMapper().selectById(id);
   }
 
+  @OpLog(type = BaseDataOpLogType.class, name = "删除门店，ID：{}", params = {"#id"})
+  @Transactional(rollbackFor = Exception.class)
+  @Override
+  public void deleteById(String id) {
+
+    Wrapper<Shop> updateWrapper = Wrappers.lambdaUpdate(Shop.class)
+        .set(Shop::getAvailable, Boolean.FALSE)
+        .eq(Shop::getId, id);
+    getBaseMapper().update(updateWrapper);
+
+    Shop record = this.findById(id);
+
+    DataChangeEventBuilder.publishLogicDelete(this, DeleteShopEvent.class, record);
+  }
+
   @OpLog(type = BaseDataOpLogType.class, name = "新增门店，ID：{}", params = {"#id"})
   @Transactional(rollbackFor = Exception.class)
   @Override
   public String create(CreateShopVo vo) {
 
-    Wrapper<Shop> checkWrapper = Wrappers.lambdaQuery(Shop.class).eq(Shop::getCode, vo.getCode());
+    Wrapper<Shop> checkWrapper = Wrappers.lambdaQuery(Shop.class)
+        .eq(Shop::getCode, vo.getCode())
+        .eq(Shop::getAvailable, Boolean.TRUE);
     if (this.count(checkWrapper) > 0) {
       throw new DefaultClientException("编号重复，请重新输入！");
     }
@@ -85,6 +104,8 @@ public class ShopServiceImpl extends BaseMpServiceImpl<ShopMapper, Shop> impleme
       data.setDescription(vo.getDescription());
     }
 
+    data.setAvailable(Boolean.TRUE);
+
     getBaseMapper().insert(data);
 
     OpLogUtil.setVariable("id", data.getId());
@@ -103,7 +124,9 @@ public class ShopServiceImpl extends BaseMpServiceImpl<ShopMapper, Shop> impleme
       throw new DefaultClientException("门店不存在！");
     }
 
-    Wrapper<Shop> checkWrapper = Wrappers.lambdaQuery(Shop.class).eq(Shop::getCode, vo.getCode())
+    Wrapper<Shop> checkWrapper = Wrappers.lambdaQuery(Shop.class)
+        .eq(Shop::getCode, vo.getCode())
+        .eq(Shop::getAvailable, Boolean.TRUE)
         .ne(Shop::getId, vo.getId());
     if (this.count(checkWrapper) > 0) {
       throw new DefaultClientException("编号重复，请重新输入！");
@@ -115,7 +138,6 @@ public class ShopServiceImpl extends BaseMpServiceImpl<ShopMapper, Shop> impleme
         .set(Shop::getDeptId, StringUtil.isBlank(vo.getDeptId()) ? null : vo.getDeptId())
         .set(Shop::getLng, vo.getLng() == null ? null : vo.getLng())
         .set(Shop::getLat, vo.getLat() == null ? null : vo.getLat())
-        .set(Shop::getAvailable, vo.getAvailable())
         .set(Shop::getDescription,
             StringUtil.isBlank(vo.getDescription()) ? StringPool.EMPTY_STR : vo.getDescription())
         .eq(Shop::getId, vo.getId());

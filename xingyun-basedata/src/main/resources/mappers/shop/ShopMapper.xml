@@ -46,9 +46,7 @@
       <if test="vo.deptId != null and vo.deptId != ''">
         AND tb.dept_id = #{vo.deptId}
       </if>
-      <if test="vo.available != null">
-        AND tb.available = #{vo.available}
-      </if>
+      AND tb.available = TRUE
       <if test="vo.createTimeStart != null">
         AND tb.create_time >= #{vo.createTimeStart}
       </if>

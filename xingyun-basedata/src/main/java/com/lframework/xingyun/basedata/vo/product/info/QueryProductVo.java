@@ -68,10 +68,4 @@ public class QueryProductVo extends SortPageVo implements BaseVo, Serializable {
    */
   @ApiModelProperty("创建截止时间")
   private LocalDateTime endTime;
-
-  /**
-   * 状态
-   */
-  @ApiModelProperty("状态")
-  private Boolean available;
 }

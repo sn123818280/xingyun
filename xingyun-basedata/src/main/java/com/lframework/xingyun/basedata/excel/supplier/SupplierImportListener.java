@@ -45,7 +45,8 @@ public class SupplierImportListener extends ExcelImportListener<SupplierImportMo
     }
     checkList.add(data.getCode());
     Wrapper<Supplier> checkWrapper = Wrappers.lambdaQuery(Supplier.class)
-        .eq(Supplier::getCode, data.getCode());
+        .eq(Supplier::getCode, data.getCode())
+        .eq(Supplier::getAvailable, Boolean.TRUE);
     SupplierService supplierService = ApplicationUtil.getBean(SupplierService.class);
     if (supplierService.count(checkWrapper) > 0) {
       throw new DefaultClientException(

@@ -22,10 +22,4 @@ public class QueryProductBrandVo extends SortPageVo implements BaseVo, Serializa
    */
   @ApiModelProperty("名称")
   private String name;
-
-  /**
-   * 状态
-   */
-  @ApiModelProperty("状态")
-  private Boolean available;
 }

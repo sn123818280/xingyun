@@ -51,8 +51,7 @@ public class UpdateProductVo implements BaseVo, Serializable {
   /**
    * 商品SKU编号
    */
-  @ApiModelProperty(value = "商品SKU编号", required = true)
-  @NotBlank(message = "商品SKU编号不能为空！")
+  @ApiModelProperty(value = "商品SKU编号")
   private String skuCode;
 
   /**
@@ -72,7 +71,6 @@ public class UpdateProductVo implements BaseVo, Serializable {
    * 品牌ID
    */
   @ApiModelProperty("品牌ID")
-  @NotBlank(message = "品牌ID不能为空！")
   private String brandId;
 
   /**
@@ -106,14 +104,14 @@ public class UpdateProductVo implements BaseVo, Serializable {
    */
   @ApiModelProperty(value = "进项税率（%）")
   @Min(value = 0, message = "进项税率（%）不允许小于0！")
-  private BigDecimal taxRate = BigDecimal.ZERO;
+  private BigDecimal taxRate;
 
   /**
    * 销项税率（%）
    */
   @ApiModelProperty(value = "销项税率（%）")
   @Min(value = 0, message = "销项税率（%）不允许小于0！")
-  private BigDecimal saleTaxRate = BigDecimal.ZERO;
+  private BigDecimal saleTaxRate;
 
   /**
    * 商品类型
@@ -154,11 +152,4 @@ public class UpdateProductVo implements BaseVo, Serializable {
    */
   @ApiModelProperty("零售价")
   private BigDecimal retailPrice;
-
-  /**
-   * 状态
-   */
-  @ApiModelProperty(value = "状态",required = true)
-  @NotNull(message = "状态不能为空！")
-  private Boolean available;
 }

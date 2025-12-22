@@ -1,5 +1,6 @@
 package com.lframework.xingyun.sc.bo.stock.take.plan;
 
+import com.lframework.starter.common.utils.StringUtil;
 import com.lframework.starter.web.core.bo.BaseBo;
 import com.lframework.starter.web.core.utils.ApplicationUtil;
 import com.lframework.xingyun.basedata.entity.Product;
@@ -93,13 +94,15 @@ public class QueryTakeStockPlanProductBo extends BaseBo<QueryTakeStockPlanProduc
         ProductCategoryService.class);
     ProductCategory productCategory = productCategoryService.findById(product.getCategoryId());
 
-    ProductBrandService productBrandService = ApplicationUtil.getBean(ProductBrandService.class);
-    ProductBrand productBrand = productBrandService.findById(product.getBrandId());
+    if(StringUtil.isNotBlank(product.getBrandId())) {
+      ProductBrandService productBrandService = ApplicationUtil.getBean(ProductBrandService.class);
+      ProductBrand productBrand = productBrandService.findById(product.getBrandId());
+      this.brandName = productBrand.getName();
+    }
 
     this.productCode = product.getCode();
     this.productName = product.getName();
     this.categoryName = productCategory.getName();
-    this.brandName = productBrand.getName();
     this.skuCode = product.getSkuCode();
     this.externalCode = product.getExternalCode();
     this.spec = product.getSpec();

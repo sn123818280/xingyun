@@ -44,7 +44,8 @@ public class CustomerImportListener extends ExcelImportListener<CustomerImportMo
     }
     checkList.add(data.getCode());
     Wrapper<Customer> checkWrapper = Wrappers.lambdaQuery(Customer.class)
-        .eq(Customer::getCode, data.getCode());
+        .eq(Customer::getCode, data.getCode())
+        .eq(Customer::getAvailable, Boolean.TRUE);
     CustomerService customerService = ApplicationUtil.getBean(CustomerService.class);
     if (customerService.count(checkWrapper) > 0) {
       throw new DefaultClientException(

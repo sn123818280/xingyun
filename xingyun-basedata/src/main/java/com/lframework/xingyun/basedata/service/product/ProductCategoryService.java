@@ -32,18 +32,11 @@ public interface ProductCategoryService extends BaseMpService<ProductCategory> {
   List<ProductCategory> selector(QueryProductCategorySelectorVo vo);
 
   /**
-   * 根据ID停用
+   * 根据ID删除
    *
    * @param id
    */
-  void unable(String id);
-
-  /**
-   * 根据ID启用
-   *
-   * @param id
-   */
-  void enable(String id);
+  void deleteById(String id);
 
   /**
    * 创建
@@ -66,5 +59,5 @@ public interface ProductCategoryService extends BaseMpService<ProductCategory> {
    * @param categoryId
    * @param parentId
    */
-  void saveRecursion(String categoryId, String parentId);
+  void saveRecursion(Boolean isCreate, String categoryId, String parentId);
 }

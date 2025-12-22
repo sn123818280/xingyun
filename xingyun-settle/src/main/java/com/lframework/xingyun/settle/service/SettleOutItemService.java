@@ -46,18 +46,11 @@ public interface SettleOutItemService extends BaseMpService<SettleOutItem> {
     SettleOutItem findById(String id);
 
     /**
-     * 根据ID停用
+     * 根据ID删除
      *
      * @param id
      */
-    void unable(String id);
-
-    /**
-     * 根据ID启用
-     *
-     * @param id
-     */
-    void enable(String id);
+    void deleteById(String id);
 
     /**
      * 创建

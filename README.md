@@ -43,8 +43,9 @@
 * 创建子线程时使用DefaultCallable或DefaultRunnable包装
 
 ### 关于多租户
-application.yml中的tenant.enabled改为true则代表开启多租户模式；false则代表关闭多租户模式。
-虽然开启和关闭多租户是由配置文件控制，但是由于两种模式数据库结构不同，不支持正在运行中的系统修改租户模式。
+~~application.yml中的tenant.enabled改为true则代表开启多租户模式；false则代表关闭多租户模式。
+虽然开启和关闭多租户是由配置文件控制，但是由于两种模式数据库结构不同，不支持正在运行中的系统修改租户模式。~~
+不再支持关闭多租户模式。
 
 ### 使用说明文档
 

@@ -18,12 +18,15 @@ import com.lframework.xingyun.basedata.vo.product.property.item.UpdateProductPro
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -112,6 +115,22 @@ public class ProductPropertyItemController extends DefaultBaseController {
     productPropertyItemService.update(vo);
 
     productPropertyItemService.cleanCacheByKey(vo.getId());
+
+    return InvokeResultBuilder.success();
+  }
+
+  /**
+   * 根据ID删除
+   */
+  @ApiOperation("根据ID删除")
+  @HasPermission({"base-data:product:property-item:delete"})
+  @DeleteMapping
+  public InvokeResult<Void> deleteById(
+      @ApiParam(value = "ID", required = true) @NotEmpty(message = "ID不能为空！") String id) {
+
+    productPropertyItemService.deleteById(id);
+
+    productPropertyItemService.cleanCacheByKey(id);
 
     return InvokeResultBuilder.success();
   }

@@ -3,10 +3,10 @@ package com.lframework.xingyun.basedata.controller;
 import com.lframework.starter.common.exceptions.impl.DefaultClientException;
 import com.lframework.starter.common.utils.CollectionUtil;
 import com.lframework.starter.web.core.annotations.security.HasPermission;
-import com.lframework.starter.web.core.controller.DefaultBaseController;
 import com.lframework.starter.web.core.components.resp.InvokeResult;
 import com.lframework.starter.web.core.components.resp.InvokeResultBuilder;
 import com.lframework.starter.web.core.components.resp.PageResult;
+import com.lframework.starter.web.core.controller.DefaultBaseController;
 import com.lframework.starter.web.core.utils.PageResultUtil;
 import com.lframework.xingyun.basedata.bo.logistics.company.GetLogisticsCompanyBo;
 import com.lframework.xingyun.basedata.bo.logistics.company.QueryLogisticsCompanyBo;
@@ -26,8 +26,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -92,31 +92,15 @@ public class LogisticsCompanyController extends DefaultBaseController {
   }
 
   /**
-   * 停用物流公司
+   * 根据ID删除
    */
-  @ApiOperation("停用物流公司")
-  @HasPermission({"base-data:logistics-company:modify"})
-  @PatchMapping("/unable")
-  public InvokeResult<Void> batchUnable(
+  @ApiOperation("根据ID删除")
+  @HasPermission({"base-data:logistics-company:delete"})
+  @DeleteMapping
+  public InvokeResult<Void> deleteById(
       @ApiParam(value = "ID", required = true) @NotEmpty(message = "物流公司ID不能为空！") String id) {
 
-    logisticsCompanyService.unable(id);
-
-    logisticsCompanyService.cleanCacheByKey(id);
-
-    return InvokeResultBuilder.success();
-  }
-
-  /**
-   * 启用物流公司
-   */
-  @ApiOperation("启用物流公司")
-  @HasPermission({"base-data:logistics-company:modify"})
-  @PatchMapping("/enable")
-  public InvokeResult<Void> batchEnable(
-      @ApiParam(value = "ID", required = true) @NotEmpty(message = "物流公司ID不能为空！") String id) {
-
-    logisticsCompanyService.enable(id);
+    logisticsCompanyService.deleteById(id);
 
     logisticsCompanyService.cleanCacheByKey(id);
 

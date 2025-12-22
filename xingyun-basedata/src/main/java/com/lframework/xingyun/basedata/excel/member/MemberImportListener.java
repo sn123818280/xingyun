@@ -49,7 +49,8 @@ public class MemberImportListener extends ExcelImportListener<MemberImportModel>
     }
     checkList.add(data.getCode());
     Wrapper<Member> checkWrapper = Wrappers.lambdaQuery(Member.class)
-        .eq(Member::getCode, data.getCode());
+        .eq(Member::getCode, data.getCode())
+        .eq(Member::getAvailable, Boolean.TRUE);
     MemberService memberService = ApplicationUtil.getBean(MemberService.class);
     if (memberService.count(checkWrapper) > 0) {
       throw new DefaultClientException(
@@ -121,6 +122,7 @@ public class MemberImportListener extends ExcelImportListener<MemberImportModel>
       if (!StringUtil.isBlank(data.getTelephone())) {
         Wrapper<Member> checkWrapper = Wrappers.lambdaQuery(Member.class)
             .eq(Member::getTelephone, data.getTelephone())
+            .eq(Member::getAvailable, Boolean.TRUE)
             .ne(Member::getId, record.getId());
         if (memberService.count(checkWrapper) > 0) {
           throw new DefaultClientException(

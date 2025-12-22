@@ -21,6 +21,7 @@ import com.lframework.xingyun.basedata.vo.shop.UpdateShopVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
@@ -31,6 +32,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -97,6 +99,22 @@ public class ShopController extends DefaultBaseController {
   public InvokeResult<Void> create(@Valid CreateShopVo vo) {
 
     shopService.create(vo);
+
+    return InvokeResultBuilder.success();
+  }
+
+  /**
+   * 删除
+   */
+  @ApiOperation("删除")
+  @HasPermission({"base-data:shop:delete"})
+  @DeleteMapping
+  public InvokeResult<Void> deleteById(
+      @ApiParam(value = "ID", required = true) @NotBlank(message = "门店ID不能为空！") String id) {
+
+    shopService.deleteById(id);
+
+    shopService.cleanCacheByKey(id);
 
     return InvokeResultBuilder.success();
   }

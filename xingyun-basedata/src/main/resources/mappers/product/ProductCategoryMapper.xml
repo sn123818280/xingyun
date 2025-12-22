@@ -24,17 +24,14 @@
 
     <select id="getAllProductCategories" resultMap="ProductCategory">
         <include refid="ProductCategoryDto_sql"/>
+        WHERE available = TRUE
         ORDER BY code
     </select>
 
     <select id="selector" resultMap="ProductCategory">
         <include refid="ProductCategoryDto_sql"/>
         <where>
-            <if test="vo != null">
-                <if test="vo.available != null">
-                    AND available = #{vo.available}
-                </if>
-            </if>
+            AND available = TRUE
         </where>
         ORDER BY code
     </select>

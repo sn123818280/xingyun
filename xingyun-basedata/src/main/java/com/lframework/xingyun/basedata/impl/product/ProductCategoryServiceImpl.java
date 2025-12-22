@@ -7,22 +7,27 @@ import com.lframework.starter.common.exceptions.impl.DefaultClientException;
 import com.lframework.starter.common.utils.CollectionUtil;
 import com.lframework.starter.common.utils.ObjectUtil;
 import com.lframework.starter.common.utils.StringUtil;
+import com.lframework.starter.web.core.annotations.oplog.OpLog;
+import com.lframework.starter.web.core.event.DataChangeEventBuilder;
 import com.lframework.starter.web.core.impl.BaseMpServiceImpl;
 import com.lframework.starter.web.core.utils.IdUtil;
+import com.lframework.starter.web.core.utils.OpLogUtil;
+import com.lframework.starter.web.inner.service.RecursionMappingService;
+import com.lframework.xingyun.basedata.entity.Product;
 import com.lframework.xingyun.basedata.entity.ProductCategory;
 import com.lframework.xingyun.basedata.enums.BaseDataOpLogType;
 import com.lframework.xingyun.basedata.enums.ProductCategoryNodeType;
+import com.lframework.xingyun.basedata.events.DeleteProductCategoryEvent;
 import com.lframework.xingyun.basedata.mappers.ProductCategoryMapper;
 import com.lframework.xingyun.basedata.service.product.ProductCategoryService;
+import com.lframework.xingyun.basedata.service.product.ProductService;
 import com.lframework.xingyun.basedata.vo.product.category.CreateProductCategoryVo;
 import com.lframework.xingyun.basedata.vo.product.category.QueryProductCategorySelectorVo;
 import com.lframework.xingyun.basedata.vo.product.category.UpdateProductCategoryVo;
-import com.lframework.starter.web.core.annotations.oplog.OpLog;
-import com.lframework.starter.web.inner.service.RecursionMappingService;
-import com.lframework.starter.web.core.utils.OpLogUtil;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -36,6 +41,9 @@ public class ProductCategoryServiceImpl extends
 
   @Autowired
   private RecursionMappingService recursionMappingService;
+
+  @Autowired
+  private ProductService productService;
 
   @Override
   public List<ProductCategory> getAllProductCategories() {
@@ -56,10 +64,10 @@ public class ProductCategoryServiceImpl extends
     return getBaseMapper().selector(vo);
   }
 
-  @OpLog(type = BaseDataOpLogType.class, name = "停用商品分类，ID：{}", params = "#id")
+  @OpLog(type = BaseDataOpLogType.class, name = "删除商品分类，ID：{}", params = "#id")
   @Transactional(rollbackFor = Exception.class)
   @Override
-  public void unable(String id) {
+  public void deleteById(String id) {
 
     List<String> batchIds = new ArrayList<>();
     batchIds.add(id);
@@ -72,24 +80,12 @@ public class ProductCategoryServiceImpl extends
     Wrapper<ProductCategory> updateWrapper = Wrappers.lambdaUpdate(ProductCategory.class)
         .set(ProductCategory::getAvailable, Boolean.FALSE).in(ProductCategory::getId, batchIds);
     getBaseMapper().update(updateWrapper);
-  }
 
-  @OpLog(type = BaseDataOpLogType.class, name = "启用商品分类，ID：{}", params = "#id")
-  @Transactional(rollbackFor = Exception.class)
-  @Override
-  public void enable(String id) {
+    for (String categoryId : batchIds) {
+      ProductCategory category = this.findById(categoryId);
 
-    List<String> batchIds = new ArrayList<>();
-    batchIds.add(id);
-    List<String> nodeParentIds = recursionMappingService.getNodeParentIds(id,
-        ProductCategoryNodeType.class);
-    if (CollectionUtil.isNotEmpty(nodeParentIds)) {
-      batchIds.addAll(nodeParentIds);
+      DataChangeEventBuilder.publishLogicDelete(this, DeleteProductCategoryEvent.class, category);
     }
-
-    Wrapper<ProductCategory> updateWrapper = Wrappers.lambdaUpdate(ProductCategory.class)
-        .set(ProductCategory::getAvailable, Boolean.TRUE).in(ProductCategory::getId, batchIds);
-    getBaseMapper().update(updateWrapper);
   }
 
   @OpLog(type = BaseDataOpLogType.class, name = "新增商品分类，ID：{}, 编号：{}", params = {"#id",
@@ -100,14 +96,14 @@ public class ProductCategoryServiceImpl extends
 
     //查询Code是否重复
     Wrapper<ProductCategory> checkCodeWrapper = Wrappers.lambdaQuery(ProductCategory.class)
-        .eq(ProductCategory::getCode, vo.getCode());
+        .eq(ProductCategory::getCode, vo.getCode()).eq(ProductCategory::getAvailable, Boolean.TRUE);
     if (getBaseMapper().selectCount(checkCodeWrapper) > 0) {
       throw new DefaultClientException("编号重复，请重新输入！");
     }
 
     //查询Name是否重复
     Wrapper<ProductCategory> checkNameWrapper = Wrappers.lambdaQuery(ProductCategory.class)
-        .eq(ProductCategory::getName, vo.getName());
+        .eq(ProductCategory::getName, vo.getName()).eq(ProductCategory::getAvailable, Boolean.TRUE);
     if (getBaseMapper().selectCount(checkNameWrapper) > 0) {
       throw new DefaultClientException("名称重复，请重新输入！");
     }
@@ -115,9 +111,18 @@ public class ProductCategoryServiceImpl extends
     //如果parentId不为空，查询上级分类是否存在
     if (!StringUtil.isBlank(vo.getParentId())) {
       Wrapper<ProductCategory> checkParentWrapper = Wrappers.lambdaQuery(ProductCategory.class)
-          .eq(ProductCategory::getId, vo.getParentId());
+          .eq(ProductCategory::getId, vo.getParentId())
+          .eq(ProductCategory::getAvailable, Boolean.TRUE);
       if (getBaseMapper().selectCount(checkParentWrapper) == 0) {
         throw new DefaultClientException("上级分类不存在，请检查！");
+      }
+
+      // 然后判断上级分类下是否有商品，如果有商品不允许新增子分类
+      Wrapper<Product> checkProductWrapper = Wrappers.lambdaQuery(Product.class)
+          .eq(Product::getCategoryId, vo.getParentId())
+          .eq(Product::getAvailable, Boolean.TRUE);
+      if (productService.count(checkProductWrapper) > 0) {
+        throw new DefaultClientException("上级分类已关联商品，不允许新增子分类！");
       }
     }
 
@@ -133,7 +138,7 @@ public class ProductCategoryServiceImpl extends
 
     getBaseMapper().insert(data);
 
-    this.saveRecursion(data.getId(), data.getParentId());
+    this.saveRecursion(true, data.getId(), data.getParentId());
 
     OpLogUtil.setVariable("id", data.getId());
     OpLogUtil.setVariable("code", vo.getCode());
@@ -155,14 +160,16 @@ public class ProductCategoryServiceImpl extends
 
     //查询Code是否重复
     Wrapper<ProductCategory> checkCodeWrapper = Wrappers.lambdaQuery(ProductCategory.class)
-        .eq(ProductCategory::getCode, vo.getCode()).ne(ProductCategory::getId, data.getId());
+        .eq(ProductCategory::getCode, vo.getCode()).eq(ProductCategory::getAvailable, Boolean.TRUE)
+        .ne(ProductCategory::getId, data.getId());
     if (getBaseMapper().selectCount(checkCodeWrapper) > 0) {
       throw new DefaultClientException("编号重复，请重新输入！");
     }
 
     //查询Name是否重复
     Wrapper<ProductCategory> checkNameWrapper = Wrappers.lambdaQuery(ProductCategory.class)
-        .eq(ProductCategory::getName, vo.getName()).ne(ProductCategory::getId, data.getId());
+        .eq(ProductCategory::getName, vo.getName()).eq(ProductCategory::getAvailable, Boolean.TRUE)
+        .ne(ProductCategory::getId, data.getId());
     if (getBaseMapper().selectCount(checkNameWrapper) > 0) {
       throw new DefaultClientException("名称重复，请重新输入！");
     }
@@ -171,22 +178,9 @@ public class ProductCategoryServiceImpl extends
         .set(ProductCategory::getCode, vo.getCode()).set(ProductCategory::getName, vo.getName())
         .set(ProductCategory::getDescription,
             StringUtil.isBlank(vo.getDescription()) ? StringPool.EMPTY_STR : vo.getDescription())
-        .set(ProductCategory::getAvailable, vo.getAvailable())
         .eq(ProductCategory::getId, data.getId());
 
     getBaseMapper().update(updateWrapper);
-
-    if (!vo.getAvailable()) {
-      if (data.getAvailable()) {
-        //如果是停用 子节点全部停用
-        this.unable(data.getId());
-      }
-    } else {
-      if (!data.getAvailable()) {
-        //如果是启用 父节点全部启用
-        this.enable(data.getId());
-      }
-    }
 
     OpLogUtil.setVariable("id", data.getId());
     OpLogUtil.setVariable("code", vo.getCode());
@@ -200,7 +194,11 @@ public class ProductCategoryServiceImpl extends
    * @param parentId
    */
   @Override
-  public void saveRecursion(String categoryId, String parentId) {
+  public void saveRecursion(Boolean isCreate, String categoryId, String parentId) {
+
+    if (!isCreate) {
+      recursionMappingService.deleteNode(categoryId, ProductCategoryNodeType.class);
+    }
 
     if (!StringUtil.isBlank(parentId)) {
       List<String> parentIds = recursionMappingService.getNodeParentIds(parentId,
@@ -210,12 +208,32 @@ public class ProductCategoryServiceImpl extends
       }
       parentIds.add(parentId);
 
-      recursionMappingService.saveNode(categoryId,
-          ProductCategoryNodeType.class,
+      recursionMappingService.saveNode(categoryId, ProductCategoryNodeType.class,
           parentIds);
     } else {
-      recursionMappingService.saveNode(categoryId,
-          ProductCategoryNodeType.class);
+      recursionMappingService.saveNode(categoryId, ProductCategoryNodeType.class);
+    }
+
+    // 还要更新这个节点的子节点
+    List<String> childIds = recursionMappingService.getNodeChildIds(categoryId,
+        ProductCategoryNodeType.class);
+
+    for (String childId : childIds) {
+      List<ProductCategory> parentDeptList = new ArrayList<>();
+      ProductCategory productCategory = this.findById(childId);
+
+      while (StringUtil.isNotBlank(productCategory.getParentId())) {
+        productCategory = this.findById(productCategory.getParentId());
+        if (productCategory == null) {
+          break;
+        }
+        parentDeptList.add(productCategory);
+      }
+
+      parentDeptList = CollectionUtil.reverse(parentDeptList);
+      recursionMappingService.deleteNode(childId, ProductCategoryNodeType.class);
+      recursionMappingService.saveNode(childId, ProductCategoryNodeType.class,
+          parentDeptList.stream().map(ProductCategory::getId).collect(Collectors.toList()));
     }
   }
 

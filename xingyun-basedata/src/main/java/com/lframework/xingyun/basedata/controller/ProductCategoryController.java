@@ -3,20 +3,19 @@ package com.lframework.xingyun.basedata.controller;
 import com.lframework.starter.common.exceptions.impl.DefaultClientException;
 import com.lframework.starter.common.utils.CollectionUtil;
 import com.lframework.starter.web.core.annotations.security.HasPermission;
-import com.lframework.starter.web.core.controller.DefaultBaseController;
 import com.lframework.starter.web.core.components.resp.InvokeResult;
 import com.lframework.starter.web.core.components.resp.InvokeResultBuilder;
+import com.lframework.starter.web.core.controller.DefaultBaseController;
 import com.lframework.starter.web.core.utils.ExcelUtil;
+import com.lframework.starter.web.inner.service.RecursionMappingService;
 import com.lframework.xingyun.basedata.bo.product.category.GetProductCategoryBo;
 import com.lframework.xingyun.basedata.bo.product.category.ProductCategoryTreeBo;
 import com.lframework.xingyun.basedata.entity.ProductCategory;
-import com.lframework.xingyun.basedata.enums.ProductCategoryNodeType;
 import com.lframework.xingyun.basedata.excel.product.category.ProductCategoryImportListener;
 import com.lframework.xingyun.basedata.excel.product.category.ProductCategoryImportModel;
 import com.lframework.xingyun.basedata.service.product.ProductCategoryService;
 import com.lframework.xingyun.basedata.vo.product.category.CreateProductCategoryVo;
 import com.lframework.xingyun.basedata.vo.product.category.UpdateProductCategoryVo;
-import com.lframework.starter.web.inner.service.RecursionMappingService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -29,8 +28,8 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -95,31 +94,15 @@ public class ProductCategoryController extends DefaultBaseController {
   }
 
   /**
-   * 停用分类
+   * 根据ID删除
    */
-  @ApiOperation("停用分类")
-  @HasPermission({"base-data:product:category:modify"})
-  @PatchMapping("/unable")
-  public InvokeResult<Void> unable(
+  @ApiOperation("根据ID删除")
+  @HasPermission({"base-data:product:category:delete"})
+  @DeleteMapping
+  public InvokeResult<Void> deleteById(
       @ApiParam(value = "ID", required = true) @NotEmpty(message = "分类ID不能为空！") String id) {
 
-    productCategoryService.unable(id);
-    productCategoryService.cleanCacheByKey(id);
-
-    return InvokeResultBuilder.success();
-  }
-
-  /**
-   * 启用分类
-   */
-  @ApiOperation("启用分类")
-  @HasPermission({"base-data:product:category:modify"})
-  @PatchMapping("/enable")
-  public InvokeResult<Void> enable(
-      @ApiParam(value = "ID", required = true) @NotEmpty(message = "分类ID不能为空！") String id) {
-
-    productCategoryService.enable(id);
-
+    productCategoryService.deleteById(id);
     productCategoryService.cleanCacheByKey(id);
 
     return InvokeResultBuilder.success();
@@ -149,31 +132,6 @@ public class ProductCategoryController extends DefaultBaseController {
     productCategoryService.update(vo);
 
     productCategoryService.cleanCacheByKey(vo.getId());
-
-    ProductCategory data = productCategoryService.findById(vo.getId());
-    if (!vo.getAvailable()) {
-      if (data.getAvailable()) {
-        //如果是停用 子节点全部停用
-        List<String> childrenIds = recursionMappingService.getNodeChildIds(data.getId(),
-            ProductCategoryNodeType.class);
-        if (!CollectionUtil.isEmpty(childrenIds)) {
-          for (String childrenId : childrenIds) {
-            productCategoryService.cleanCacheByKey(childrenId);
-          }
-        }
-      }
-    } else {
-      if (!data.getAvailable()) {
-        //如果是启用 父节点全部启用
-        List<String> parentIds = recursionMappingService.getNodeParentIds(data.getId(),
-            ProductCategoryNodeType.class);
-        if (!CollectionUtil.isEmpty(parentIds)) {
-          for (String parentId : parentIds) {
-            productCategoryService.cleanCacheByKey(parentId);
-          }
-        }
-      }
-    }
 
     return InvokeResultBuilder.success();
   }

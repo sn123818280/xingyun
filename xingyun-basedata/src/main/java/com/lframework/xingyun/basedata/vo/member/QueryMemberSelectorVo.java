@@ -12,12 +12,6 @@ public class QueryMemberSelectorVo extends PageVo implements BaseVo, Serializabl
   private static final long serialVersionUID = 1L;
 
   /**
-   * 状态
-   */
-  @ApiModelProperty("状态")
-  private Boolean available;
-
-  /**
    * 编号
    */
   @ApiModelProperty("编号")

@@ -30,8 +30,8 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -92,31 +92,15 @@ public class MemberController extends DefaultBaseController {
   }
 
   /**
-   * 停用会员
+   * 删除会员
    */
-  @ApiOperation("停用会员")
-  @HasPermission({"base-data:member:modify"})
-  @PatchMapping("/unable")
-  public InvokeResult<Void> unable(
+  @ApiOperation("删除会员")
+  @HasPermission({"base-data:member:delete"})
+  @DeleteMapping
+  public InvokeResult<Void> deleteById(
       @ApiParam(value = "ID", required = true) @NotEmpty(message = "会员ID不能为空！") String id) {
 
-    memberService.unable(id);
-
-    memberService.cleanCacheByKey(id);
-
-    return InvokeResultBuilder.success();
-  }
-
-  /**
-   * 启用会员
-   */
-  @ApiOperation("启用会员")
-  @HasPermission({"base-data:member:modify"})
-  @PatchMapping("/enable")
-  public InvokeResult<Void> enable(
-      @ApiParam(value = "ID", required = true) @NotEmpty(message = "会员ID不能为空！") String id) {
-
-    memberService.enable(id);
+    memberService.deleteById(id);
 
     memberService.cleanCacheByKey(id);
 

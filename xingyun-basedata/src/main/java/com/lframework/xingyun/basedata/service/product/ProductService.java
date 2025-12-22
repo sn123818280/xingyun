@@ -67,18 +67,12 @@ public interface ProductService extends BaseMpService<Product> {
   List<String> getIdByCategoryId(String categoryId);
 
   /**
-   * 根据ID停用
+   * 根据ID删除
    *
-   * @param ids
+   * @param id
    */
-  void batchUnable(Collection<String> ids);
+  void deleteById(String id);
 
-  /**
-   * 根据ID启用
-   *
-   * @param ids
-   */
-  void batchEnable(Collection<String> ids);
 
   /**
    * 创建

@@ -22,10 +22,4 @@ public class QueryStoreCenterSelectorVo extends PageVo implements BaseVo, Serial
    */
   @ApiModelProperty("名称")
   private String name;
-
-  /**
-   * 状态
-   */
-  @ApiModelProperty("状态")
-  private Boolean available;
 }

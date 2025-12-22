@@ -408,9 +408,6 @@ public class BaseDataSelectorController extends DefaultBaseController {
     if (!StringUtil.isEmpty(vo.getName())) {
       queryWrapper.like(Shop::getName, vo.getName());
     }
-    if (vo.getAvailable() != null) {
-      queryWrapper.eq(Shop::getAvailable, vo.getAvailable());
-    }
 
     Page<Shop> page = new Page<>(getPageIndex(vo), getPageSize(vo));
     page = shopService.page(page, queryWrapper);

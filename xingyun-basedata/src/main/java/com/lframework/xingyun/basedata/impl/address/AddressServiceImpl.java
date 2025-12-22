@@ -85,7 +85,8 @@ public class AddressServiceImpl extends BaseMpServiceImpl<AddressMapper, Address
     if (vo.getIsDefault()) {
       Wrapper<Address> checkWrapper = Wrappers.lambdaQuery(Address.class)
           .eq(Address::getEntityId, vo.getEntityId())
-          .eq(Address::getAddressType, vo.getAddressType()).eq(Address::getIsDefault, Boolean.TRUE);
+          .eq(Address::getAddressType, vo.getAddressType())
+          .eq(Address::getIsDefault, Boolean.TRUE);
       if (this.count(checkWrapper) > 0) {
         throw new DefaultClientException("实体已存在默认地址，不允许再新增默认地址！");
       }
@@ -105,7 +106,7 @@ public class AddressServiceImpl extends BaseMpServiceImpl<AddressMapper, Address
     DicCityDto province = dicCityService.findById(city.getParentId());
     data.setProvinceId(province.getId());
     data.setAddress(vo.getAddress());
-    data.setIsDefault(vo.getIsDefault());
+    data.setIsDefault(vo.getIsDefault());;
 
     getBaseMapper().insert(data);
 
@@ -125,7 +126,8 @@ public class AddressServiceImpl extends BaseMpServiceImpl<AddressMapper, Address
     if (vo.getIsDefault()) {
       Wrapper<Address> checkWrapper = Wrappers.lambdaQuery(Address.class)
           .eq(Address::getEntityId, vo.getEntityId())
-          .eq(Address::getAddressType, vo.getAddressType()).eq(Address::getIsDefault, Boolean.TRUE)
+          .eq(Address::getAddressType, vo.getAddressType())
+          .eq(Address::getIsDefault, Boolean.TRUE)
           .ne(Address::getId, vo.getId());
       if (this.count(checkWrapper) > 0) {
         throw new DefaultClientException("实体已存在默认地址，不允许再新增默认地址！");
@@ -151,8 +153,10 @@ public class AddressServiceImpl extends BaseMpServiceImpl<AddressMapper, Address
   @Override
   public Address getDefaultAddress(String entityId, Integer entityType, Integer addressType) {
     Wrapper<Address> queryWrapper = Wrappers.lambdaQuery(Address.class)
-        .eq(Address::getEntityId, entityId).eq(Address::getEntityType, entityType)
-        .eq(Address::getAddressType, addressType).eq(Address::getIsDefault, Boolean.TRUE);
+        .eq(Address::getEntityId, entityId)
+        .eq(Address::getEntityType, entityType)
+        .eq(Address::getAddressType, addressType)
+        .eq(Address::getIsDefault, Boolean.TRUE);
     return this.getOne(queryWrapper);
   }
 

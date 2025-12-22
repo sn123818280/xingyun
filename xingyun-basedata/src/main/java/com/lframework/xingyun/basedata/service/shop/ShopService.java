@@ -36,6 +36,12 @@ public interface ShopService extends BaseMpService<Shop> {
   Shop findById(String id);
 
   /**
+   * 根据ID删除（逻辑删除）
+   * @param id
+   */
+  void deleteById(String id);
+
+  /**
    * 创建
    * @param vo
    * @return

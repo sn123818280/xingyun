@@ -64,12 +64,6 @@ public class GetLogisticsCompanyBo extends BaseBo<LogisticsCompany> {
   private String address;
 
   /**
-   * 状态
-   */
-  @ApiModelProperty("状态")
-  private Boolean available;
-
-  /**
    * 备注
    */
   @ApiModelProperty("备注")

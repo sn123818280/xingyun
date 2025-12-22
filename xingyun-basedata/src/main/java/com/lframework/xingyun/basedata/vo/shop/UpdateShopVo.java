@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -56,14 +55,6 @@ public class UpdateShopVo implements BaseVo, Serializable {
   @ApiModelProperty("纬度")
   @TypeMismatch(message = "纬度格式有误！")
   private BigDecimal lat;
-
-  /**
-   * 状态
-   */
-  @ApiModelProperty(value = "状态", required = true)
-  @TypeMismatch(message = "状态格式有误！")
-  @NotNull(message = "请选择状态！")
-  private Boolean available;
 
   /**
    * 备注

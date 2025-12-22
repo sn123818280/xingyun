@@ -22,10 +22,4 @@ public class QueryLogisticsCompanySelectorVo extends PageVo implements BaseVo, S
    */
   @ApiModelProperty("名称")
   private String name;
-
-  /**
-   * 状态
-   */
-  @ApiModelProperty("状态")
-  private Boolean available;
 }

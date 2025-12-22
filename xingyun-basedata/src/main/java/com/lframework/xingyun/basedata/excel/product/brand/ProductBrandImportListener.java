@@ -8,8 +8,8 @@ import com.lframework.starter.common.constants.StringPool;
 import com.lframework.starter.common.exceptions.impl.DefaultClientException;
 import com.lframework.starter.common.utils.RegUtil;
 import com.lframework.starter.common.utils.StringUtil;
-import com.lframework.starter.web.core.utils.ApplicationUtil;
 import com.lframework.starter.web.core.components.excel.ExcelImportListener;
+import com.lframework.starter.web.core.utils.ApplicationUtil;
 import com.lframework.starter.web.core.utils.IdUtil;
 import com.lframework.xingyun.basedata.entity.ProductBrand;
 import com.lframework.xingyun.basedata.service.product.ProductBrandService;
@@ -35,11 +35,12 @@ public class ProductBrandImportListener extends ExcelImportListener<ProductBrand
     }
     if (checkList.contains(data.getCode())) {
       throw new DefaultClientException(
-          "第" + context.readRowHolder().getRowIndex() + "行“编号”与第" + (checkList.indexOf(data.getCode()) + 1) + "行重复");
+          "第" + context.readRowHolder().getRowIndex() + "行“编号”与第" + (
+              checkList.indexOf(data.getCode()) + 1) + "行重复");
     }
     checkList.add(data.getCode());
     Wrapper<ProductBrand> checkWrapper = Wrappers.lambdaQuery(ProductBrand.class)
-        .eq(ProductBrand::getCode, data.getCode());
+        .eq(ProductBrand::getCode, data.getCode()).eq(ProductBrand::getAvailable, Boolean.TRUE);
     ProductBrandService productBrandService = ApplicationUtil.getBean(ProductBrandService.class);
     if (productBrandService.count(checkWrapper) > 0) {
       throw new DefaultClientException(
@@ -61,7 +62,8 @@ public class ProductBrandImportListener extends ExcelImportListener<ProductBrand
       ProductBrandImportModel data = datas.get(i);
 
       Wrapper<ProductBrand> checkNameWrapper = Wrappers.lambdaQuery(ProductBrand.class)
-          .eq(ProductBrand::getName, data.getName()).ne(ProductBrand::getCode, data.getCode());
+          .eq(ProductBrand::getName, data.getName()).eq(ProductBrand::getAvailable, Boolean.TRUE)
+          .ne(ProductBrand::getCode, data.getCode());
       if (productBrandService.count(checkNameWrapper) > 0) {
         throw new DefaultClientException(
             "第" + (i + 1) + "行“名称”重复，请重新输入");

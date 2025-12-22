@@ -68,10 +68,4 @@ public class QueryProductSelectorVo extends PageVo implements BaseVo, Serializab
   @ApiModelProperty("商品类型")
   @IsEnum(message = "商品类型格式错误！", enumClass = ProductType.class)
   private Integer productType;
-
-  /**
-   * 状态
-   */
-  @ApiModelProperty("状态")
-  private Boolean available;
 }

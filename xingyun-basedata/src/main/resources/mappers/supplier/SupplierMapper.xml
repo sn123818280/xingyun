@@ -18,10 +18,8 @@
                 <if test="vo.name != null and vo.name != ''">
                     AND name LIKE CONCAT('%', #{vo.name}, '%')
                 </if>
-                <if test="vo.available != null">
-                    AND available = #{vo.available}
-                </if>
             </if>
+            AND available = TRUE
         </where>
         ORDER BY code
     </select>
@@ -39,10 +37,8 @@
                 <if test="vo.manageType != null">
                     AND manage_type = #{vo.manageType}
                 </if>
-                <if test="vo.available != null">
-                    AND available = #{vo.available}
-                </if>
             </if>
+            AND available = TRUE
         </where>
         ORDER BY code
     </select>

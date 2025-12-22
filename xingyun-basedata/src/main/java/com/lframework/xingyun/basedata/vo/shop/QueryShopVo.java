@@ -45,11 +45,4 @@ public class QueryShopVo extends SortPageVo implements BaseVo, Serializable {
   @TypeMismatch(message = "创建时间截止时间格式有误！")
   private LocalDateTime createTimeEnd;
 
-  /**
-   * 状态
-   */
-  @ApiModelProperty("状态")
-  @TypeMismatch(message = "状态格式有误！")
-  private Boolean available;
-
 }

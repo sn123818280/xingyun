@@ -41,16 +41,15 @@
                 <if test="vo.name != null and vo.name != ''">
                     AND name LIKE CONCAT('%', #{vo.name}, '%')
                 </if>
-                <if test="vo.available != null">
-                    AND available = #{vo.available}
-                </if>
             </if>
+            AND available = TRUE
         </where>
         ORDER BY code
     </select>
     <select id="getByPropertyId" resultMap="ProductPropertyItem">
         <include refid="ProductPropertyItemDto_sql"/>
         WHERE property_id = #{propertyId}
+        AND available = TRUE
         ORDER BY code
     </select>
 </mapper>

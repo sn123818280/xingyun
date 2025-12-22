@@ -41,7 +41,8 @@ public class StoreCenterImportListener extends ExcelImportListener<StoreCenterIm
     }
     checkList.add(data.getCode());
     Wrapper<StoreCenter> checkWrapper = Wrappers.lambdaQuery(StoreCenter.class)
-        .eq(StoreCenter::getCode, data.getCode());
+        .eq(StoreCenter::getCode, data.getCode())
+        .eq(StoreCenter::getAvailable, Boolean.TRUE);
     StoreCenterService storeCenterService = ApplicationUtil.getBean(StoreCenterService.class);
     if (storeCenterService.count(checkWrapper) > 0) {
       throw new DefaultClientException(

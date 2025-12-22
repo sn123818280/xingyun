@@ -1,6 +1,5 @@
 package com.lframework.xingyun.basedata.vo.shop;
 
-import com.lframework.starter.web.core.components.validation.TypeMismatch;
 import com.lframework.starter.web.core.vo.BaseVo;
 import com.lframework.starter.web.core.vo.PageVo;
 import io.swagger.annotations.ApiModelProperty;
@@ -24,10 +23,4 @@ public class ShopSelectorVo extends PageVo implements BaseVo, Serializable {
   @ApiModelProperty("名称")
   private String name;
 
-  /**
-   * 状态
-   */
-  @ApiModelProperty("状态")
-  @TypeMismatch(message = "状态格式有误！")
-  private Boolean available;
 }

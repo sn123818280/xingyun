@@ -26,8 +26,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -91,31 +91,15 @@ public class StockAdjustReasonController extends DefaultBaseController {
   }
 
   /**
-   * 停用库存调整原因
+   * 根据ID删除
    */
-  @ApiOperation("停用库存调整原因")
-  @HasPermission({"stock:adjust:reason:modify"})
-  @PatchMapping("/unable")
-  public InvokeResult<Void> unable(
+  @ApiOperation("根据ID删除")
+  @HasPermission({"stock:adjust:reason:delete"})
+  @DeleteMapping
+  public InvokeResult<Void> deleteById(
       @ApiParam(value = "ID", required = true) @NotEmpty(message = "库存调整原因ID不能为空！") String id) {
 
-    stockAdjustReasonService.unable(id);
-
-    stockAdjustReasonService.cleanCacheByKey(id);
-
-    return InvokeResultBuilder.success();
-  }
-
-  /**
-   * 启用库存调整原因
-   */
-  @ApiOperation("启用库存调整原因")
-  @HasPermission({"stock:adjust:reason:modify"})
-  @PatchMapping("/enable")
-  public InvokeResult<Void> enable(
-      @ApiParam(value = "ID", required = true) @NotEmpty(message = "库存调整原因ID不能为空！") String id) {
-
-    stockAdjustReasonService.enable(id);
+    stockAdjustReasonService.deleteById(id);
 
     stockAdjustReasonService.cleanCacheByKey(id);
 

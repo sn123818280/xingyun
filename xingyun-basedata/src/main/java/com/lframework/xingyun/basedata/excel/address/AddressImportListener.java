@@ -47,7 +47,8 @@ public class AddressImportListener extends ExcelImportListener<AddressImportMode
     if (entityType == AddressEntityType.SC) {
       StoreCenterService storeCenterService = ApplicationUtil.getBean(StoreCenterService.class);
       Wrapper<StoreCenter> queryWrapper = Wrappers.lambdaQuery(StoreCenter.class)
-          .eq(StoreCenter::getCode, data.getEntityCode());
+          .eq(StoreCenter::getCode, data.getEntityCode())
+          .eq(StoreCenter::getAvailable, Boolean.TRUE);
       StoreCenter sc = storeCenterService.getOne(queryWrapper);
       if (sc == null) {
         throw new DefaultClientException(
@@ -57,7 +58,8 @@ public class AddressImportListener extends ExcelImportListener<AddressImportMode
     } else if (entityType == AddressEntityType.CUSTOMER) {
       CustomerService customerService = ApplicationUtil.getBean(CustomerService.class);
       Wrapper<Customer> queryWrapper = Wrappers.lambdaQuery(Customer.class)
-          .eq(Customer::getCode, data.getEntityCode());
+          .eq(Customer::getCode, data.getEntityCode())
+          .eq(Customer::getAvailable, Boolean.TRUE);
       Customer customer = customerService.getOne(queryWrapper);
       if (customer == null) {
         throw new DefaultClientException(
@@ -67,7 +69,8 @@ public class AddressImportListener extends ExcelImportListener<AddressImportMode
     } else if (entityType == AddressEntityType.SUPPLIER) {
       SupplierService supplierService = ApplicationUtil.getBean(SupplierService.class);
       Wrapper<Supplier> queryWrapper = Wrappers.lambdaQuery(Supplier.class)
-          .eq(Supplier::getCode, data.getEntityCode());
+          .eq(Supplier::getCode, data.getEntityCode())
+          .eq(Supplier::getAvailable, Boolean.TRUE);
       Supplier supplier = supplierService.getOne(queryWrapper);
       if (supplier == null) {
         throw new DefaultClientException(
@@ -77,7 +80,8 @@ public class AddressImportListener extends ExcelImportListener<AddressImportMode
     } else if (entityType == AddressEntityType.MEMBER) {
       MemberService memberService = ApplicationUtil.getBean(MemberService.class);
       Wrapper<Member> queryWrapper = Wrappers.lambdaQuery(Member.class)
-          .eq(Member::getCode, data.getEntityCode());
+          .eq(Member::getCode, data.getEntityCode())
+          .eq(Member::getAvailable, Boolean.TRUE);
       Member member = memberService.getOne(queryWrapper);
       if (member == null) {
         throw new DefaultClientException(
@@ -87,7 +91,8 @@ public class AddressImportListener extends ExcelImportListener<AddressImportMode
     } else if (entityType == AddressEntityType.SHOP) {
       ShopService shopService = ApplicationUtil.getBean(ShopService.class);
       Wrapper<Shop> queryWrapper = Wrappers.lambdaQuery(Shop.class)
-          .eq(Shop::getCode, data.getEntityCode());
+          .eq(Shop::getCode, data.getEntityCode())
+          .eq(Shop::getAvailable, Boolean.TRUE);
       Shop shop = shopService.getOne(queryWrapper);
       if (shop == null) {
         throw new DefaultClientException(

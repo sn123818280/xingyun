@@ -44,6 +44,13 @@ public interface PayTypeService extends BaseMpService<PayType> {
   PayType findById(String id);
 
   /**
+   * 根据ID删除（逻辑删除）
+   *
+   * @param id
+   */
+  void deleteById(String id);
+
+  /**
    * 创建
    *
    * @param vo

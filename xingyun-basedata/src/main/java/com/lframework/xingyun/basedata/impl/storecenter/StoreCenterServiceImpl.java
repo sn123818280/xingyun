@@ -10,23 +10,25 @@ import com.lframework.starter.common.exceptions.impl.InputErrorException;
 import com.lframework.starter.common.utils.Assert;
 import com.lframework.starter.common.utils.ObjectUtil;
 import com.lframework.starter.common.utils.StringUtil;
-import com.lframework.starter.web.core.impl.BaseMpServiceImpl;
+import com.lframework.starter.web.core.annotations.oplog.OpLog;
 import com.lframework.starter.web.core.components.resp.PageResult;
+import com.lframework.starter.web.core.event.DataChangeEventBuilder;
+import com.lframework.starter.web.core.impl.BaseMpServiceImpl;
 import com.lframework.starter.web.core.utils.IdUtil;
+import com.lframework.starter.web.core.utils.OpLogUtil;
 import com.lframework.starter.web.core.utils.PageHelperUtil;
 import com.lframework.starter.web.core.utils.PageResultUtil;
+import com.lframework.starter.web.inner.dto.dic.city.DicCityDto;
+import com.lframework.starter.web.inner.service.DicCityService;
 import com.lframework.xingyun.basedata.entity.StoreCenter;
 import com.lframework.xingyun.basedata.enums.BaseDataOpLogType;
+import com.lframework.xingyun.basedata.events.DeleteStoreCenterEvent;
 import com.lframework.xingyun.basedata.mappers.StoreCenterMapper;
 import com.lframework.xingyun.basedata.service.storecenter.StoreCenterService;
 import com.lframework.xingyun.basedata.vo.storecenter.CreateStoreCenterVo;
 import com.lframework.xingyun.basedata.vo.storecenter.QueryStoreCenterSelectorVo;
 import com.lframework.xingyun.basedata.vo.storecenter.QueryStoreCenterVo;
 import com.lframework.xingyun.basedata.vo.storecenter.UpdateStoreCenterVo;
-import com.lframework.starter.web.core.annotations.oplog.OpLog;
-import com.lframework.starter.web.inner.dto.dic.city.DicCityDto;
-import com.lframework.starter.web.inner.service.DicCityService;
-import com.lframework.starter.web.core.utils.OpLogUtil;
 import java.io.Serializable;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,24 +63,19 @@ public class StoreCenterServiceImpl extends BaseMpServiceImpl<StoreCenterMapper,
     return getBaseMapper().selectById(id);
   }
 
-  @OpLog(type = BaseDataOpLogType.class, name = "停用仓库，ID：{}", params = "#id")
+  @OpLog(type = BaseDataOpLogType.class, name = "删除仓库，ID：{}", params = "#id")
   @Transactional(rollbackFor = Exception.class)
   @Override
-  public void unable(String id) {
+  public void deleteById(String id) {
 
     Wrapper<StoreCenter> updateWrapper = Wrappers.lambdaUpdate(StoreCenter.class)
-        .set(StoreCenter::getAvailable, Boolean.FALSE).eq(StoreCenter::getId, id);
+        .set(StoreCenter::getAvailable, Boolean.FALSE)
+        .eq(StoreCenter::getId, id);
     getBaseMapper().update(updateWrapper);
-  }
 
-  @OpLog(type = BaseDataOpLogType.class, name = "启用仓库，ID：{}", params = "#id")
-  @Transactional(rollbackFor = Exception.class)
-  @Override
-  public void enable(String id) {
+    StoreCenter record = this.findById(id);
 
-    Wrapper<StoreCenter> updateWrapper = Wrappers.lambdaUpdate(StoreCenter.class)
-        .set(StoreCenter::getAvailable, Boolean.TRUE).eq(StoreCenter::getId, id);
-    getBaseMapper().update(updateWrapper);
+    DataChangeEventBuilder.publishLogicDelete(this, DeleteStoreCenterEvent.class, record);
   }
 
   @OpLog(type = BaseDataOpLogType.class, name = "新增仓库，ID：{}, 编号：{}", params = {"#id",
@@ -88,7 +85,8 @@ public class StoreCenterServiceImpl extends BaseMpServiceImpl<StoreCenterMapper,
   public String create(CreateStoreCenterVo vo) {
 
     Wrapper<StoreCenter> checkWrapper = Wrappers.lambdaQuery(StoreCenter.class)
-        .eq(StoreCenter::getCode, vo.getCode());
+        .eq(StoreCenter::getCode, vo.getCode())
+        .eq(StoreCenter::getAvailable, Boolean.TRUE);
     if (getBaseMapper().selectCount(checkWrapper) > 0) {
       throw new DefaultClientException("编号重复，请重新输入！");
     }
@@ -146,7 +144,9 @@ public class StoreCenterServiceImpl extends BaseMpServiceImpl<StoreCenterMapper,
     }
 
     Wrapper<StoreCenter> checkWrapper = Wrappers.lambdaQuery(StoreCenter.class)
-        .eq(StoreCenter::getCode, vo.getCode()).ne(StoreCenter::getId, vo.getId());
+        .eq(StoreCenter::getCode, vo.getCode())
+        .eq(StoreCenter::getAvailable, Boolean.TRUE)
+        .ne(StoreCenter::getId, vo.getId());
     if (getBaseMapper().selectCount(checkWrapper) > 0) {
       throw new DefaultClientException("编号重复，请重新输入！");
     }
@@ -156,7 +156,6 @@ public class StoreCenterServiceImpl extends BaseMpServiceImpl<StoreCenterMapper,
         .set(StoreCenter::getContact, !StringUtil.isBlank(vo.getContact()) ? vo.getContact() : null)
         .set(StoreCenter::getTelephone,
             !StringUtil.isBlank(vo.getTelephone()) ? vo.getTelephone() : null)
-        .set(StoreCenter::getAvailable, vo.getAvailable())
         .set(StoreCenter::getAddress, !StringUtil.isBlank(vo.getAddress()) ? vo.getAddress() : null)
         .set(StoreCenter::getDescription,
             StringUtil.isBlank(vo.getDescription()) ? StringPool.EMPTY_STR : vo.getDescription())

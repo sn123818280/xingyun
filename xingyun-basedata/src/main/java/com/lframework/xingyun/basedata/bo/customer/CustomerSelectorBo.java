@@ -26,12 +26,6 @@ public class CustomerSelectorBo extends BaseBo<Customer> {
     @ApiModelProperty("名称")
     private String name;
 
-    /**
-     * 状态
-     */
-    @ApiModelProperty("状态")
-    private Boolean available;
-
     public CustomerSelectorBo() {
 
     }

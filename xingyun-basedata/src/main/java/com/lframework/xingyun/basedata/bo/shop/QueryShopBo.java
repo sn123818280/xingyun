@@ -47,12 +47,6 @@ public class QueryShopBo extends BaseBo<Shop> {
   private String deptName;
 
   /**
-   * 状态
-   */
-  @ApiModelProperty("状态")
-  private Boolean available;
-
-  /**
    * 备注
    */
   @ApiModelProperty("备注")

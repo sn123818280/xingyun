@@ -62,10 +62,8 @@
                 <if test="vo.name != null and vo.name != ''">
                     AND p.name LIKE CONCAT('%', #{vo.name}, '%')
                 </if>
-                <if test="vo.available != null">
-                    AND p.available = #{vo.available}
-                </if>
             </if>
+            AND p.available = TRUE
         </where>
         ORDER BY p.code
     </select>

@@ -158,7 +158,6 @@ public class TakeStockPlanServiceImpl extends BaseMpServiceImpl<TakeStockPlanMap
         // 全场盘点
         // 将所有商品添加明细
         QueryProductVo queryProductVo = new QueryProductVo();
-        queryProductVo.setAvailable(Boolean.TRUE);
         queryProductVo.setProductType(ProductType.NORMAL.getCode());
         Integer count = productService.queryCount(queryProductVo);
         if (count > 2000) {

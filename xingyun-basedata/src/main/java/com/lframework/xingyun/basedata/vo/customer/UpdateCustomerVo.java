@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -115,13 +114,6 @@ public class UpdateCustomerVo implements BaseVo, Serializable {
    */
   @ApiModelProperty("银行账号")
   private String accountNo;
-
-  /**
-   * 状态
-   */
-  @ApiModelProperty(value = "状态", required = true)
-  @NotNull(message = "状态不能为空！")
-  private Boolean available;
 
   /**
    * 备注

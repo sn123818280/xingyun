@@ -16,9 +16,6 @@ jugg:
     worker-id: 1
     #数据中心ID
     center-id: 1
-  #开启多租户
-  tenant:
-    enabled: true
   #开启websocket
   ws:
     enabled: true

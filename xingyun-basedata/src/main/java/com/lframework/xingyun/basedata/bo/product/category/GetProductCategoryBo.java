@@ -43,12 +43,6 @@ public class GetProductCategoryBo extends BaseBo<ProductCategory> {
     private String parentName;
 
     /**
-     * 状态
-     */
-    @ApiModelProperty("状态")
-    private Boolean available;
-
-    /**
      * 备注
      */
     @ApiModelProperty("备注")

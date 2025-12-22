@@ -43,13 +43,6 @@ public class UpdatePayTypeVo implements BaseVo, Serializable {
   private Boolean recText;
 
   /**
-   * 状态
-   */
-  @ApiModelProperty(value = "状态", required = true)
-  @NotNull(message = "状态不能为空！")
-  private Boolean available;
-
-  /**
    * 备注
    */
   @ApiModelProperty("备注")
